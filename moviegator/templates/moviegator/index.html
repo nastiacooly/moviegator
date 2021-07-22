@@ -2,8 +2,32 @@
 {% load static %}
 
 {% block body %}
-    <h2>Index Page</h2>
-
     <div id="message">{{ message }}</div>
+
+    <section class="text-center" id="section-welcome">
+        <h1 class="brand">Moviegator</h1>
+        <h3>Randomly advises movies / TV shows based on your mood or genre preference</h3>
+
+        
+            {% if user.is_authenticated %}
+            <button type="button" class="btn btn-outline-danger btn-lg my-3">Start</button>
+            {% else %}
+            <div class="d-flex flex-row justify-content-center my-3">
+                <button type="button" class="btn btn-outline-danger btn-lg mx-2">
+                    <a href="{% url 'login' %}">Log In</a>
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-lg mx-2">
+                    <a href="{% url 'register' %}">Register</a>
+                </button>
+                <button type="button" class="btn btn-outline-danger btn-lg mx-2">Just Start*</button>
+            </div>
+            <p class="mt-3">* You can use Moviegator without registration.<br>
+            However, registration provides additional features, such as adding movies/shows to your Watchlist or "Already Watched" list, commenting and rating movies.</p>
+            {% endif %}
+        
+        
+    </section>
+
+
 
 {% endblock %}
