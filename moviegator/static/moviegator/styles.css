@@ -14,6 +14,28 @@
     }
 }
 
+@keyframes disappear {
+    0% {
+        opacity: 100%;
+    }
+
+    100% {
+        opacity: 0%;
+    }
+}
+
+@keyframes appear {
+    0% {
+        opacity: 0%;
+    }
+
+    100% {
+        opacity: 100%;
+    }
+}
+
+
+/* General styles */
 body {
     position: relative;
     color: white;
@@ -36,12 +58,20 @@ button>a, button>a:hover {
     color: white;
 }
 
+button[data-genre] {
+    width: 10rem;
+}
+
 a, a:hover {
     color: white;
 }
 
+section>div.container.d-flex {
+    height: 100%;
+}
+
 #section-login, #section-register {
-    min-height: 100vh;
+    height: 100vh;
     width: 100%;
     padding-top: 17rem;
     background: linear-gradient(180deg, rgba(4,244,251,1) 0%, rgba(14,175,122,1) 35%, rgba(0,0,0,1) 100%);
@@ -49,33 +79,47 @@ a, a:hover {
 
 #section-welcome {
     position: absolute;
-    z-index: 3;
+    z-index: 5;
     top: 0;
-    min-height: 100vh;
+    height: 100vh;
     width: 100vw;
     background: linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(65,38,38,1) 35%, rgba(242,35,20,1) 100%);
     padding-top: 17rem;
-    animation-name: slideToTop;
-    animation-duration: 1s;
-    animation-play-state: paused;
 }
 
 #section-start, #section-mood-genre {
     position: absolute;
     top: 0;
-    min-height: 100vh;
+    height: 100vh;
     width: 100vw;
     background: linear-gradient(180deg, rgba(4,244,251,1) 0%, rgba(14,175,122,1) 35%, rgba(0,0,0,1) 100%);
     padding-top: 20rem;
-    animation-name: slideToTop;
-    animation-duration: 1s;
-    animation-play-state: paused;
-}
-
-#section-mood-genre {
-    z-index: 1;
 }
 
 #section-start {
+    z-index: 4;
+}
+
+#section-mood-genre {
+    z-index: 3;
+}
+
+#section-mood {
+    position: absolute;
     z-index: 2;
+    top: 0;
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(65,38,38,1) 35%, rgba(242,35,20,1) 100%);
+    padding-top: 20rem;
+}
+
+#section-genre {
+    position: absolute;
+    z-index: 2;
+    top: 0;
+    height: 100vh;
+    width: 100vw;
+    background: linear-gradient(180deg, rgba(2,0,36,1) 0%, rgba(65,38,38,1) 35%, rgba(242,35,20,1) 100%);
+    padding-top: 20rem;
 }

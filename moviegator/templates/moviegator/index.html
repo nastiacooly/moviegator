@@ -30,12 +30,19 @@
 
     <!--Start section with Movie or TV show choice -->
     <section style="display: none;" id='section-start'>
-        <div class="container text-center px-5">
-            <h1>What Moviegator should find for you?</h1>
+        <div class="container text-center d-flex flex-column justify-content-between">
+            <div class="px-5">
+                <h1>What Moviegator should find for you?</h1>
 
-            <div class="d-flex flex-row justify-content-center mt-2">
-                <button class="btn btn-outline-light btn-lg mx-2" type="button" data-type="movie">Movie</button>
-                <button class="btn btn-outline-light btn-lg mx-2" type="button" data-type="show">TV Show</button>
+                <div class="d-flex flex-row justify-content-center mt-2">
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-type="movie">Movie</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-type="show">TV Show</button>
+                </div>
+            </div>
+            <div class="mb-5">
+                <button class="btn btn-outline-dark btn-sm" type="button">
+                    <a href="{% url 'index' %}">Back to Start</a>
+                </button>
             </div>
         </div>
     </section>
@@ -43,40 +50,88 @@
 
     <!--Section with mood or genre choice -->
     <section style="display: none;" id='section-mood-genre'>
-        <div class="container text-center px-5">
-            <h1>Should Moviegator advise based<br>on your mood or your genre preference?</h1>
+        <div class="container text-center d-flex flex-column justify-content-between">
+            <div class="px-5">
+                <h1>Should Moviegator advise based<br>on your mood or your genre preference?</h1>
 
-            <div class="d-flex flex-row justify-content-center mt-2">
-                <button class="btn btn-outline-light btn-lg mx-2" type="button" data-base="mood">Mood</button>
-                <button class="btn btn-outline-light btn-lg mx-2" type="button" data-base="genre">Genre</button>
+                <div class="d-flex flex-row justify-content-center mt-2">
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-base="mood">Mood</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-base="genre">Genre</button>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <button class="btn btn-outline-dark btn-sm" type="button">
+                    <a href="{% url 'index' %}">Back to Start</a>
+                </button>
             </div>
         </div>
     </section>
 
 
-    <!--Section for mood choice TODO -->
+    <!--Section for mood choice TODO LIKE GENRES-->
     <section style="display: none;" id='section-mood'>
-        <div class="container text-center px-5">
-            <h1>How's your mood today?</h1>
+        <div class="container text-center d-flex flex-column justify-content-between">
+            <div class="px-5">
+                <h1>How's your mood today?</h1>
 
-            <div class="d-flex flex-row justify-content-center mt-2">
-                <button class="btn btn-outline-light btn-lg mx-2" type="button" data-mood=""></button>
-                <button class="btn btn-outline-light btn-lg mx-2" type="button" data-mood=""></button>
+                <div class="d-flex flex-row justify-content-center mt-2">
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="comedy">Cheerful</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="drama">Reflective</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="comedy">Humorous</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="romance">Romantic</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="mystery">Mysterious</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="horror">Gloomy</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="fantasy">Dreamy</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="action">Energetic</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="thriller">Spooky</button>
+                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="western">Wild</button>
+                </div>
+            </div>
+            <div class="mb-5">
+                <button class="btn btn-outline-dark btn-sm" type="button">
+                    <a href="{% url 'index' %}">Back to Start</a>
+                </button>
             </div>
         </div>
     </section>
 
 
-    <!--Section for genre choice TODO -->
+    <!--Section for genre choice-->
     <section style="display: none;" id='section-genre'>
-        <div class="container text-center px-5">
-            <h1>Which genre do you prefer today?</h1>
+        <div class="container text-center d-flex flex-column justify-content-between">
+            <div class="container">
+                <h1>Which genre do you prefer today?</h1>
 
-            <div class="d-flex flex-row justify-content-center mt-2">
-                <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="drama">Drama</button>
-                <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="comedy">Comedy</button>
-                <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre=""></button>
-                <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre=""></button>
+                <div class="row row-cols-auto mt-3 mb-2">
+                    <div class="col">
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="drama">Drama</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="fantasy">Fantasy</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="romance">Romance</button>
+                    </div>
+                </div>
+
+                <div class="row row-cols-auto my-2">
+                    <div class="col">
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="comedy">Comedy</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="horror">Horror</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="thriller">Thriller</button>
+                    </div>
+                </div>
+
+                <div class="row row-cols-auto my-2">
+                    <div class="col">
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="action">Action</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="mystery">Mystery</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="western">Western</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mb-5">
+                <button class="btn btn-outline-dark btn-sm" type="button">
+                    <a href="{% url 'index' %}">Back to Start</a>
+                </button>
             </div>
         </div>
     </section>
