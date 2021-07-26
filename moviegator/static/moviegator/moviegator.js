@@ -4,11 +4,19 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionStart = document.querySelector('#section-start'),
         sectionMoodGenre = document.querySelector('#section-mood-genre'),
         sectionMood = document.querySelector('#section-mood'),
-        sectionGenre = document.querySelector('#section-genre');
+        sectionGenre = document.querySelector('#section-genre'),
+        sectionResult = document.querySelector('#section-result'),
+        resultContainer = document.querySelector('.result-container');
 
 
-    // Navbar hide/show on hover TODO
+    // Navbar hide/show on hover
     const navbar = document.querySelector('.navbar');
+    navbar.addEventListener('mouseover', (e) => {
+        navbar.style.animation = `appear 1s linear 0s 1 normal forwards`;
+    });
+    navbar.addEventListener('mouseout', (e) => {
+        navbar.style.animation = `disappear 1s linear 0s 1 normal forwards`;
+    });
 
 
     // Click 'Start' btn to enter start section
@@ -21,6 +29,7 @@ document.addEventListener('DOMContentLoaded', () => {
             show(sectionStart);
         });
     }
+
 
     // Start choice (Movie or TV Show)
     const firstChoiceButtons = sectionStart.querySelectorAll('button[data-type]');
@@ -44,7 +53,27 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Mood or genre choice
+
+    // Start choice (for Random)
+    const randomButtons = sectionStart.querySelectorAll('button[data-random]');
+    if (randomButtons) {
+        randomButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                // Saving user's choice
+                randomTypeChoice = e.target.dataset.random;
+                console.log(randomTypeChoice);
+                hideWithAnimation(sectionStart, 'slideToTop');
+                // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
+                result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer).render();
+                // Showing result section
+                show(sectionResult);
+            });
+
+        });
+    }
+
+
+    // 'Mood or genre' choice
     const moodBtn = sectionMoodGenre.querySelector('button[data-base="mood"]');
     const genreBtn = sectionMoodGenre.querySelector('button[data-base="genre"]');
 
@@ -68,12 +97,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    
+    // Genre choice (based on mood or genre itself)
+    const moodButtons = sectionMood.querySelectorAll('button[data-genre]');
+    const genreButtons = sectionGenre.querySelectorAll('button[data-genre]');
+
+    if (moodButtons) {
+        // Choosing mood (clicking button) shows section with movie recommendations
+        moodButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                // Saving genre according to mood choice
+                genreChoice = e.target.dataset.genre;
+                console.log(genreChoice);
+                // Hiding current section
+                hideWithAnimation(sectionMood, 'disappear');
+                // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
+                result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer).render();
+                // Showing next section
+                showWithAnimation(sectionResult, 'appear');
+            });
+        });
+    }
+
+    if (genreButtons) {
+        // Choosing mood (clicking button) shows section with movie recommendations
+        genreButtons.forEach(button => {
+            button.addEventListener('click', (e) => {
+                // Saving genre according to mood choice
+                genreChoice = e.target.dataset.genre;
+                console.log(genreChoice);
+                // Hiding current section
+                hideWithAnimation(sectionGenre, 'disappear');
+                // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
+                result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer).render();
+                // Showing next section
+                showWithAnimation(sectionResult, 'appear');
+            });
+        });
+    }
+
+
 });
 
 
 // Variables to access globally
 
 let movieOrShowChoice = '';
+let genreChoice = '';
+let randomTypeChoice = '';
 
 
 // Helper functions
@@ -99,16 +170,17 @@ function showWithAnimation(element, animationName) {
 }
 
 
-// Class for movie cards TODO LATER
+// Class for movie card
 class MovieCard {
-    constructor(src, alt, title, year, descr, parentSelector, ...classes) {
+    constructor(src, alt, title, year, descr, id, parentElement, ...classes) {
         this.src = src;
         this.alt = alt;
         this.title = title;
         this.year = year;
         this.descr = descr;
+        this.id = id;
         this.classes = classes;
-        this.parent = document.querySelector(parentSelector);
+        this.parent = parentElement;
         
     }
 
@@ -116,23 +188,25 @@ class MovieCard {
         const movieCardElement = document.createElement('div');
 
         if (this.classes.length === 0) {
-            this.classes = 'menu__item';
-            movieCardElement.classList.add(this.classes);
+            this.classes = ['card', 'text-center', 'text-white', 'mt-2'];
+            this.classes.forEach(className => movieCardElement.classList.add(className)); 
             //adding default class to the element in case they were not specified
         } else {
-            this.classes.forEach(className => menuItemElement.classList.add(className)); 
+            this.classes.forEach(className => movieCardElement.classList.add(className)); 
             //adding specified classes to the element
         }
         
         movieCardElement.innerHTML = `
-                <img src=${this.src} alt=${this.alt}>
-                <h3 class="menu__item-subtitle">${this.title}</h3>
-                <div class="menu__item-descr">${this.descr}</div>
-                <div class="menu__item-divider"></div>
-                <div class="menu__item-price">
-                    <div class="menu__item-cost">Цена:</div>
-                    <div class="menu__item-total"><span>${this.price}</span> руб/день</div>
+            <img src=${this.src} class="card-img-top" alt=${this.alt}>
+            <div class="card-body">
+                <h5 class="card-title">${this.title}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">${this.year}</h6>
+                <p class="card-text">${this.descr}</p>
+                <div class="d-flex flex-row justify-content-center">
+                    <button class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id}>Add to Watchlist</button>
+                    <button class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id}>Watched</button>
                 </div>
+            </div>
         `;
         this.parent.append(movieCardElement); // adding to DOM
     }

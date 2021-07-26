@@ -34,14 +34,23 @@
             <div class="px-5">
                 <h1>What Moviegator should find for you?</h1>
 
-                <div class="d-flex flex-row justify-content-center mt-2">
+                <div class="d-flex flex-row justify-content-center mt-2 mb-5">
                     <button class="btn btn-outline-light btn-lg mx-2" type="button" data-type="movie">Movie</button>
                     <button class="btn btn-outline-light btn-lg mx-2" type="button" data-type="show">TV Show</button>
                 </div>
+
+                <h3>Or Moviegator can show you random movies / shows from</h3>
+
+                <div class="d-flex flex-row justify-content-center my-2">
+                    <button class="btn btn-success mx-2" type="button" data-random="trend">Current Trends</button>
+                    <button class="btn btn-success mx-2" type="button" data-random="top">Top-250</button>
+                    <button class="btn btn-success mx-2" type="button" data-random="full">Full Random</button>
+                </div>
             </div>
+
             <div class="mb-5">
-                <button class="btn btn-outline-dark btn-sm" type="button">
-                    <a href="{% url 'index' %}">Back to Start</a>
+                <button class="btn btn-dark btn-sm" type="button" onClick="window.location.reload();">
+                    Back to Start
                 </button>
             </div>
         </div>
@@ -61,36 +70,48 @@
             </div>
 
             <div class="mb-5">
-                <button class="btn btn-outline-dark btn-sm" type="button">
-                    <a href="{% url 'index' %}">Back to Start</a>
+                <button class="btn btn-dark btn-sm" type="button" onClick="window.location.reload();">
+                    Back to Start
                 </button>
             </div>
         </div>
     </section>
 
 
-    <!--Section for mood choice TODO LIKE GENRES-->
+    <!--Section for mood choice-->
     <section style="display: none;" id='section-mood'>
         <div class="container text-center d-flex flex-column justify-content-between">
-            <div class="px-5">
+            <div class="container">
                 <h1>How's your mood today?</h1>
 
-                <div class="d-flex flex-row justify-content-center mt-2">
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="comedy">Cheerful</button>
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="drama">Reflective</button>
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="comedy">Humorous</button>
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="romance">Romantic</button>
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="mystery">Mysterious</button>
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="horror">Gloomy</button>
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="fantasy">Dreamy</button>
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="action">Energetic</button>
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="thriller">Spooky</button>
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="western">Wild</button>
+                <div class="row row-cols-auto mt-3 mb-2">
+                    <div class="col">
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="comedy">Cheerful</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="drama">Reflective</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="action">Energetic</button>
+                    </div>
+                </div>
+
+                <div class="row row-cols-auto mt-3 mb-2">
+                    <div class="col">
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="romance">Romantic</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="mystery">Mysterious</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="horror">Gloomy</button>
+                    </div>
+                </div>
+
+                <div class="row row-cols-auto mt-3 mb-2">
+                    <div class="col">
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="fantasy">Dreamy</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="thriller">Spooky</button>
+                        <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="western">Wild</button>
+                    </div>
                 </div>
             </div>
+
             <div class="mb-5">
-                <button class="btn btn-outline-dark btn-sm" type="button">
-                    <a href="{% url 'index' %}">Back to Start</a>
+                <button class="btn btn-outline-dark btn-sm" type="button" onClick="window.location.reload();">
+                    Back to Start
                 </button>
             </div>
         </div>
@@ -129,8 +150,29 @@
             </div>
 
             <div class="mb-5">
-                <button class="btn btn-outline-dark btn-sm" type="button">
-                    <a href="{% url 'index' %}">Back to Start</a>
+                <button class="btn btn-outline-dark btn-sm" type="button" onClick="window.location.reload();">
+                    Back to Start
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!--Section with recommendation results-->
+    <section style="display: none;" id='section-result'>
+        <div class="container text-center d-flex flex-column justify-content-between">
+            <div class="px-5">
+
+                <h1>Moviegator recommends you to watch</h1>
+
+                <div class="result-container px-5">
+                    
+                </div>
+
+            </div>
+
+            <div class="mb-5">
+                <button class="btn btn-outline-dark btn-sm" type="button" onClick="window.location.reload();">
+                    Back to Start
                 </button>
             </div>
         </div>
