@@ -4,6 +4,8 @@
 {% block body %}
     <div id="message">{{ message }}</div>
 
+    <span class="menu-arrow" data-slide="down">menu &#8595;</span>
+
     <!--Welcome overlay section -->
     <section class="text-center" id="section-welcome">
         <h1 class="brand">Moviegator</h1>
@@ -170,9 +172,12 @@
 
             </div>
 
-            <div class="mb-5">
-                <button class="btn btn-outline-dark btn-sm" type="button" onClick="window.location.reload();">
-                    Back to Start
+            <div class="d-flex flex-row justify-content-center mb-5">
+                <button type="button" class="btn btn-outline-dark btn-lg mx-2" data-action="more">
+                    More Results for my preferences
+                </button>
+                <button class="btn btn-outline-dark btn-lg mx-2" type="button" onClick="window.location.reload();">
+                    Start Over
                 </button>
             </div>
         </div>

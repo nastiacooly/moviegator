@@ -9,13 +9,22 @@ document.addEventListener('DOMContentLoaded', () => {
         resultContainer = document.querySelector('.result-container');
 
 
-    // Navbar hide/show on hover
+    // Navbar hide/show
     const navbar = document.querySelector('.navbar');
-    navbar.addEventListener('mouseover', (e) => {
-        navbar.style.animation = `appear 1s linear 0s 1 normal forwards`;
-    });
-    navbar.addEventListener('mouseout', (e) => {
-        navbar.style.animation = `disappear 1s linear 0s 1 normal forwards`;
+    const menuArrow = document.querySelector('.menu-arrow');
+    menuArrow.addEventListener('click', (e) => {
+        if (e.target.dataset.slide == 'down') {
+            menuArrow.style.animation = `slideDown 1s linear 0s 1 normal forwards`;
+            navbar.style.animation = `enterScreen 1s linear 0s 1 normal forwards`;
+            e.target.dataset.slide = 'up';
+            menuArrow.innerHTML = "menu &#8593;";
+        }
+        else if (e.target.dataset.slide == 'up') {
+            menuArrow.style.animation = `slideUp 1s linear 0s 1 normal forwards`;
+            navbar.style.animation = `exitScreen 1s linear 0s 1 normal forwards`;
+            e.target.dataset.slide = 'down';
+            menuArrow.innerHTML = "menu &#8595;";
+        }
     });
 
 
@@ -112,7 +121,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Hiding current section
                 hideWithAnimation(sectionMood, 'disappear');
                 // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
-                result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer).render();
+                let result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer);
+                result.render();
                 // Showing next section
                 showWithAnimation(sectionResult, 'appear');
             });
@@ -129,10 +139,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Hiding current section
                 hideWithAnimation(sectionGenre, 'disappear');
                 // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
-                result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer).render();
+                let result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer);
+                result.render();
                 // Showing next section
                 showWithAnimation(sectionResult, 'appear');
             });
+        });
+    }
+
+    // More results for user's preferences
+    const moreButton = sectionResult.querySelector('button[data-action="more"]');
+    if (moreButton) {
+        moreButton.addEventListener('click', (e) => {
+            // Remove previous result element
+            const previousResult = sectionResult.querySelector('div.card');
+            previousResult.remove();
+            // Creating new movie card and rendering it (CHANGE TO FETCH LATER)
+            let result = new MovieCard('https://centretownmovies.files.wordpress.com/2015/08/back_to_the_future.jpg', 'poster', 'Back to the Future', '1985', 'Doc', 'tt003333', resultContainer);
+            result.render();
         });
     }
 
