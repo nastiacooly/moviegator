@@ -1,3 +1,14 @@
+// Importing my helper functions
+import * as helper from '/static/moviegator/scripts/_helper.js';
+
+
+// Variables to access globally
+let movieOrShowChoice = '';
+let genreChoice = '';
+let randomTypeChoice = '';
+
+
+// Dynamic page interactions
 document.addEventListener('DOMContentLoaded', () => {
     // Variables for app sections
     const sectionWelcome = document.querySelector('#section-welcome'),
@@ -34,8 +45,8 @@ document.addEventListener('DOMContentLoaded', () => {
         startBtn.addEventListener('click', function(e) {
             e.preventDefault();
             // Hiding current section and showing next section
-            hideWithAnimation(sectionWelcome, 'slideToTop');
-            show(sectionStart);
+            helper.hideWithAnimation(sectionWelcome, 'slideToTop');
+            helper.show(sectionStart);
         });
     }
 
@@ -56,8 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Storing user's choice to variable
                 movieOrShowChoice = e.target.dataset.type;
                 // Hiding current section's content and showing next section's content
-                hideWithAnimation(sectionStart, 'disappear');
-                showWithAnimation(sectionMoodGenre, 'appear');
+                helper.hideWithAnimation(sectionStart, 'disappear');
+                helper.showWithAnimation(sectionMoodGenre, 'appear');
             });
         });
     }
@@ -71,11 +82,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Saving user's choice
                 randomTypeChoice = e.target.dataset.random;
                 console.log(randomTypeChoice);
-                hideWithAnimation(sectionStart, 'slideToTop');
+                helper.hideWithAnimation(sectionStart, 'slideToTop');
                 // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
-                result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer).render();
+                let result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer);
+                result.render();
                 // Showing result section
-                show(sectionResult);
+                helper.show(sectionResult);
             });
 
         });
@@ -90,9 +102,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clicking 'mood' button shows section for mood choice
         moodBtn.addEventListener('click', () => {
             // Hiding current section
-            hideWithAnimation(sectionMoodGenre, 'disappear');
+            helper.hideWithAnimation(sectionMoodGenre, 'disappear');
             // Showing next section
-            showWithAnimation(sectionMood, 'appear');
+            helper.showWithAnimation(sectionMood, 'appear');
         });
     }
 
@@ -100,9 +112,9 @@ document.addEventListener('DOMContentLoaded', () => {
         // Clicking 'genre' button shows section for genre choice
         genreBtn.addEventListener('click', () => {
             // Hiding current section
-            hideWithAnimation(sectionMoodGenre, 'disappear');
+            helper.hideWithAnimation(sectionMoodGenre, 'disappear');
             // Showing next section
-            showWithAnimation(sectionGenre, 'appear');
+            helper.showWithAnimation(sectionGenre, 'appear');
         });
     }
 
@@ -119,12 +131,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 genreChoice = e.target.dataset.genre;
                 console.log(genreChoice);
                 // Hiding current section
-                hideWithAnimation(sectionMood, 'disappear');
+                helper.hideWithAnimation(sectionMood, 'disappear');
                 // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
                 let result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer);
                 result.render();
                 // Showing next section
-                showWithAnimation(sectionResult, 'appear');
+                helper.showWithAnimation(sectionResult, 'appear');
             });
         });
     }
@@ -137,12 +149,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 genreChoice = e.target.dataset.genre;
                 console.log(genreChoice);
                 // Hiding current section
-                hideWithAnimation(sectionGenre, 'disappear');
+                helper.hideWithAnimation(sectionGenre, 'disappear');
                 // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
                 let result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer);
                 result.render();
                 // Showing next section
-                showWithAnimation(sectionResult, 'appear');
+                helper.showWithAnimation(sectionResult, 'appear');
             });
         });
     }
@@ -162,36 +174,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 });
-
-
-// Variables to access globally
-
-let movieOrShowChoice = '';
-let genreChoice = '';
-let randomTypeChoice = '';
-
-
-// Helper functions
-
-function hide(element) {
-    element.style.display = 'none';
-}
-
-function show(element) {
-    element.style.display = 'block';
-}
-
-function hideWithAnimation(element, animationName) {
-    element.style.animation = `${animationName} 1s linear 0s 1 normal forwards`;
-    element.addEventListener('animationend', () => {
-        hide(element);
-    });
-}
-
-function showWithAnimation(element, animationName) {
-    show(element);
-    element.style.animation = `${animationName} 2s linear 0s 1 normal forwards`;
-}
 
 
 // Class for movie card
@@ -235,59 +217,3 @@ class MovieCard {
         this.parent.append(movieCardElement); // adding to DOM
     }
 }
-
-
-// Function to make GET-requests
-const getResource = async (url) => {
-    const result = await fetch(url);
-
-    if(!result.ok) { // in case the request was unsuccessful
-        throw new Error(`Could not get resources from ${url}, status: ${result.status}`);
-    }
-
-    return await result.json();
-};
-
-/* TO USE LATER
-getResource('API url...')
-    .then(data => {
-        data.forEach(({src, alt, title, year, descr}) => { //деструктурируем объекты из массива api.json
-            new MovieCard( //передаем классу в качестве аргументов ключи объектов api.json
-                src, 
-                alt, 
-                title,
-                year, 
-                descr, 
-                "parentSelector"
-            ).render();
-        });
-    }); 
-*/
-
-
-// Function for POST-requests
-const postData = async (url, data) => {
-    const result = await fetch(url, {
-        method: 'POST',
-        headers: {
-            'Content-type': 'application/json'
-        },
-        body: data
-    });
-
-    return await result.json();
-};
-
-/* TO USE LATER
-postData('django url', json)
-    .then(data => { //действия при успешности запроса
-        console.log(data); //показываем полученный от сервера ответ для проверки
-        ...
-    })
-    .catch(() => { //действия при неуспешности запроса
-        ...
-    })
-    .finally(() => { //действия при любом исходе запроса
-        form.reset(); //например, очистка формы на странице
-    });
-*/
