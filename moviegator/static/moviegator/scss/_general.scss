@@ -1,0 +1,97 @@
+/* General styles */
+body {
+    position: relative;
+    color: white;
+    font-family: 'Josefin Sans', sans-serif;
+}
+
+.navbar {
+    z-index: 7;
+    top: -10vh;
+}
+
+.navbar-brand, .brand {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2rem;
+}
+
+.brand {
+    color: white;
+    font-size: 16rem;
+    line-height: 10rem;
+}
+
+.menu-arrow {
+    position: absolute;
+    z-index: 6;
+    top: 0.5rem;
+    left: 1rem;
+    text-transform: uppercase;
+    transition: 0.5s all;
+    font-size: 1.5rem;
+    font-weight: 500;
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.card {
+    background-color: rgba(0, 0, 0, 0) !important;
+    border: none !important;
+    animation: scale 1.5s linear 0s 1 normal forwards;
+    &>img {
+        max-height: 30vh !important;
+        object-fit: contain !important;
+    }
+}
+
+button {
+    &>a, &>a:hover {
+        text-decoration: none;
+        color: white;
+    }
+    &[data-genre] {
+        width: 10rem;
+    }
+    
+}
+
+a, a:hover {
+    color: white;
+}
+
+section {
+    @include section-general;
+    &>div.container.d-flex {
+        height: 100%;
+    }
+    &#section {
+        &-login, &-register, &-start, &-mood-genre {
+            background: $linear-bg-light;
+        }
+        &-welcome, &-mood, &-genre, &-result {
+            background: $linear-bg-dark;
+        }
+        &-login, &-register, &-welcome {
+            z-index: 5;
+            padding-top: 17rem;
+        }
+        &-start, &-mood-genre {
+            padding-top: 20rem;
+        }
+        &-start {
+            z-index: 4;
+        }
+        &-mood-genre {
+            z-index: 3;
+        }
+        &-mood, &-genre {
+            z-index: 2;
+            padding-top: 20rem;
+        }
+        &-result {
+            z-index: 1;
+            padding-top: 10rem;
+        }
+    }
+}

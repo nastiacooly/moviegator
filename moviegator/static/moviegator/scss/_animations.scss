@@ -1,0 +1,81 @@
+@keyframes slideToTop {
+    0% {
+        top: 0;
+    }
+
+    100% {
+        top: -100vh;
+    }
+}
+
+@keyframes disappear {
+    0% {
+        opacity: 100%;
+    }
+
+    100% {
+        opacity: 0%;
+    }
+}
+
+@keyframes appear {
+    0% {
+        opacity: 0%;
+    }
+
+    100% {
+        opacity: 100%;
+    }
+}
+
+@keyframes scale {
+    0% {
+        transform: scale(0);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+@keyframes enterScreen {
+
+    0% {
+        top: -10vh;
+    }
+
+    100% {
+        top: 0;
+    }
+}
+
+@keyframes exitScreen {
+
+    0% {
+        top: 0;
+    }
+
+    100% {
+        top: -10vh;
+    }
+}
+
+@keyframes slideDown {
+    0% {
+        top: 0.5rem;
+    }
+
+    100% {
+        top: 5rem;
+    }
+}
+
+@keyframes slideUp {
+    0% {
+        top: 5rem;
+    }
+
+    100% {
+        top: 0.5rem;
+    }
+}
