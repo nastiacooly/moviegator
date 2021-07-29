@@ -11,22 +11,21 @@
         <h1 class="brand">Moviegator</h1>
         <h3>Advises random movies and TV shows based on your mood or genre preference</h3>
 
-        
-            {% if user.is_authenticated %}
-            <button type="button" class="btn btn-outline-danger btn-lg my-3" data-action="start">Start</button>
-            {% else %}
-            <div class="d-flex flex-row justify-content-center my-3">
-                <button type="button" class="btn btn-outline-danger btn-lg mx-2" data-action="login">
-                    <a href="{% url 'login' %}">Log In</a>
-                </button>
-                <button type="button" class="btn btn-outline-danger btn-lg mx-2" data-action="register">
-                    <a href="{% url 'register' %}">Register</a>
-                </button>
-                <button type="button" class="btn btn-outline-danger btn-lg mx-2" data-action="start">Just Start*</button>
-            </div>
-            <p class="mt-3">* You can use Moviegator without registration.<br>
-            However, registration provides additional features, such as adding movies/shows to your Watchlist or "Already Watched" list, commenting and rating movies.</p>
-            {% endif %}
+        {% if user.is_authenticated %}
+        <button type="button" class="btn btn-outline-danger btn-lg my-3" data-action="start">Start</button>
+        {% else %}
+        <div class="d-flex flex-row justify-content-center my-3">
+            <button type="button" class="btn btn-outline-danger btn-lg mx-2" data-action="login">
+                <a href="{% url 'login' %}">Log In</a>
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-lg mx-2" data-action="register">
+                <a href="{% url 'register' %}">Register</a>
+            </button>
+            <button type="button" class="btn btn-outline-danger btn-lg mx-2" data-action="start">Just Start*</button>
+        </div>
+        <p class="mt-3">* You can use Moviegator without registration.<br>
+        However, registration provides additional features, such as adding movies/shows to your Watchlist or "Already Watched" list, commenting and rating movies.</p>
+        {% endif %}
 
     </section>
 

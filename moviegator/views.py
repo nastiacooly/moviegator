@@ -71,3 +71,23 @@ def register(request):
         return HttpResponseRedirect(reverse("index"))
     else:
         return render(request, "moviegator/register.html")
+
+
+def profile_view(request):
+    """
+    Renders profile page of signed in user
+    """
+    user = request.user
+    return render(
+        request, 
+        "moviegator/profile.html",
+        context={
+            user: "user"
+        })
+
+
+def ratings_view(request):
+    """
+    Renders page with movies/shows rated by all users of the app
+    """
+    return render(request, "moviegator/ratings.html")
