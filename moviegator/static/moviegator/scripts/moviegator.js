@@ -8,7 +8,41 @@ let genreChoice = '';
 let randomTypeChoice = '';
 
 
-// Dynamic page interactions
+// IMDB lists IDs (for fetch)
+const MoviesListsIds = {
+    drama: 'ls046058631', // The 250 Best Drama Movies of All Time
+    comedy: 'ls058726648', // Best comedy movies
+    romance: 'ls072723203', // Best Rated Romance movies
+    fantasy: 'ls009669258', // 100 Best Fantasy Movies
+    horror: 'ls026579006', // TOP HORROR MOVIES: 2000-2021
+    thriller: 'ls062989641', // Thrilles Movies: The Essential List
+    action: 'ls058416162', // Action Movies: The Essential List
+    mystery: 'ls009668531', // 100 Best Mystery Movies
+    western: 'ls002124326' // 100 Greatest Western Movies of All Time
+};
+
+const ShowsListsIds = {
+    drama: 'ls063328951', // Top Drama TV Shows
+    comedy: 'ls059567201', // Top 100 Comedy TV Shows
+    romance: 'ls059567201', // The Most Romantic TV Shows
+    fantasy: 'ls036421812', // Best Fantasy TV Shows
+    horror: 'ls023806050', // Horror TV Shows
+    thriller: 'ls026958827', // Thriller TV Series
+    action: 'ls054323220', // Best Action TV Shows
+    mystery: 'ls020396926', // The Best Murder Mystery Thriller & Crime TV Shows
+    western: 'ls027044488' // 50 Western TV series shows
+};
+
+
+// APIs
+const top250MoviesAPI = 'https://imdb-api.com/en/API/Top250Movies/'; // for top 250 random
+const top250ShowsAPI = 'https://imdb-api.com/en/API/Top250TVs/'; // for top 250 random
+const listAPI = 'https://imdb-api.com/en/API/IMDbList/'; // for recommendations by genre
+const inTheatresAPI = 'https://imdb-api.com/en/API/InTheaters/'; // for trends
+const searchByIdAPI = 'https://imdb-api.com/en/API/Title/'; // for random
+
+
+// Dynamic page scripts
 document.addEventListener('DOMContentLoaded', () => {
     // Variables for app sections
     const sectionWelcome = document.querySelector('#section-welcome'),
