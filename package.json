@@ -1,0 +1,24 @@
+{
+  "name": "moviegator",
+  "version": "1.0.0",
+  "description": "A web-app which randomly advises movies or TV shows",
+  "main": "moviegator.js",
+  "dependencies": {},
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nastiacooly/moviegator.git"
+  },
+  "keywords": [
+    "movie"
+  ],
+  "author": "Anastasia Maryina",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/nastiacooly/moviegator/issues"
+  },
+  "homepage": "https://github.com/nastiacooly/moviegator#readme"
+}

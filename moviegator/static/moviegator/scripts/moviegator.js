@@ -1,45 +1,11 @@
-// Importing my helper functions
-import * as helper from '/static/moviegator/scripts/_helper.js';
+// importing my helper functions
+import * as helper from "./_helper.js";
 
 
 // Variables to access globally
 let movieOrShowChoice = '';
 let genreChoice = '';
 let randomTypeChoice = '';
-
-
-// IMDB lists IDs (for fetch)
-const MoviesListsIds = {
-    drama: 'ls046058631', // The 250 Best Drama Movies of All Time
-    comedy: 'ls058726648', // Best comedy movies
-    romance: 'ls072723203', // Best Rated Romance movies
-    fantasy: 'ls009669258', // 100 Best Fantasy Movies
-    horror: 'ls026579006', // TOP HORROR MOVIES: 2000-2021
-    thriller: 'ls062989641', // Thrilles Movies: The Essential List
-    action: 'ls058416162', // Action Movies: The Essential List
-    mystery: 'ls009668531', // 100 Best Mystery Movies
-    western: 'ls002124326' // 100 Greatest Western Movies of All Time
-};
-
-const ShowsListsIds = {
-    drama: 'ls063328951', // Top Drama TV Shows
-    comedy: 'ls059567201', // Top 100 Comedy TV Shows
-    romance: 'ls059567201', // The Most Romantic TV Shows
-    fantasy: 'ls036421812', // Best Fantasy TV Shows
-    horror: 'ls023806050', // Horror TV Shows
-    thriller: 'ls026958827', // Thriller TV Series
-    action: 'ls054323220', // Best Action TV Shows
-    mystery: 'ls020396926', // The Best Murder Mystery Thriller & Crime TV Shows
-    western: 'ls027044488' // 50 Western TV series shows
-};
-
-
-// APIs
-const top250MoviesAPI = 'https://imdb-api.com/en/API/Top250Movies/'; // for top 250 random
-const top250ShowsAPI = 'https://imdb-api.com/en/API/Top250TVs/'; // for top 250 random
-const listAPI = 'https://imdb-api.com/en/API/IMDbList/'; // for recommendations by genre
-const inTheatresAPI = 'https://imdb-api.com/en/API/InTheaters/'; // for trends
-const searchByIdAPI = 'https://imdb-api.com/en/API/Title/'; // for random
 
 
 // Dynamic page scripts
@@ -115,13 +81,30 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', (e) => {
                 // Saving user's choice
                 randomTypeChoice = e.target.dataset.random;
-                console.log(randomTypeChoice);
-                helper.hideWithAnimation(sectionStart, 'slideToTop');
-                // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
-                let result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer);
-                result.render();
-                // Showing result section
-                helper.show(sectionResult);
+                // Showing spinner while JSON loads
+                const spinner = helper.renderSpinner(resultContainer);
+                // Getting random movie from requested category
+                helper.getResource(`/get_data/${randomTypeChoice}`)
+                .then(data => {
+                    if (data.message) {
+                        // Displaying error message
+                        helper.renderErrorAlert(data.message);
+                    }
+                    else {
+                        // Removing any previous error messages
+                        helper.removeErrorAlert();
+                        // Removing spinner
+                        spinner.remove();
+                        // Creating movie card and rendering it
+                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.crew, data.id, resultContainer);
+                        result.render();
+                    }
+                    // Hiding previous section
+                    helper.hideWithAnimation(sectionStart, 'slideToTop');
+                    // Showing result section
+                    helper.show(sectionResult);
+                });
+                
             });
 
         });
@@ -158,37 +141,68 @@ document.addEventListener('DOMContentLoaded', () => {
     const genreButtons = sectionGenre.querySelectorAll('button[data-genre]');
 
     if (moodButtons) {
-        // Choosing mood (clicking button) shows section with movie recommendations
+        // Choosing mood (clicking button) shows section with movie recommendation
         moodButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 // Saving genre according to mood choice
                 genreChoice = e.target.dataset.genre;
-                console.log(genreChoice);
+                // Showing spinner while JSON loads
+                const spinner = helper.renderSpinner(resultContainer);
                 // Hiding current section
                 helper.hideWithAnimation(sectionMood, 'disappear');
-                // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
-                let result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer);
-                result.render();
-                // Showing next section
+                // Showing section with recommendation
                 helper.showWithAnimation(sectionResult, 'appear');
+                // Getting random movie/show for chosen mood (genre)
+                helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
+                .then(data => {
+                    if (data.message) {
+                        // Displaying error message
+                        helper.renderErrorAlert(data.message);
+                    }
+                    else {
+                        // Removing any previous error messages
+                        helper.removeErrorAlert();
+                        // Removing spinner
+                        spinner.remove();
+                        // Creating movie card and rendering it
+                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, resultContainer);
+                        result.render();
+                        
+                    }
+                });
             });
         });
     }
 
     if (genreButtons) {
-        // Choosing mood (clicking button) shows section with movie recommendations
+        // Choosing mood (clicking button) shows section with movie recommendation
         genreButtons.forEach(button => {
             button.addEventListener('click', (e) => {
                 // Saving genre according to mood choice
                 genreChoice = e.target.dataset.genre;
-                console.log(genreChoice);
+                // Showing spinner while JSON loads
+                const spinner = helper.renderSpinner(resultContainer);
                 // Hiding current section
                 helper.hideWithAnimation(sectionGenre, 'disappear');
-                // Creating example movie card and rendering it (CHANGE TO FETCH LATER)
-                let result = new MovieCard('https://upload.wikimedia.org/wikipedia/ru/9/9d/Matrix-DVD.jpg', 'poster', 'Matrix', '2004', 'Neo', 'tt002233', resultContainer);
-                result.render();
-                // Showing next section
+                // Showing section with recommendation
                 helper.showWithAnimation(sectionResult, 'appear');
+                // Getting random movie/show for chosen genre
+                helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
+                .then(data => {
+                    if (data.message) {
+                        // Displaying error message
+                        helper.renderErrorAlert(data.message);
+                    }
+                    else {
+                        // Removing any previous error messages
+                        helper.removeErrorAlert();
+                        // Removing spinner
+                        spinner.remove();
+                        // Creating movie card and rendering it
+                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, resultContainer);
+                        result.render();
+                    }
+                });
             });
         });
     }
@@ -200,9 +214,45 @@ document.addEventListener('DOMContentLoaded', () => {
             // Remove previous result element
             const previousResult = sectionResult.querySelector('div.card');
             previousResult.remove();
-            // Creating new movie card and rendering it (CHANGE TO FETCH LATER)
-            let result = new MovieCard('https://centretownmovies.files.wordpress.com/2015/08/back_to_the_future.jpg', 'poster', 'Back to the Future', '1985', 'Doc', 'tt003333', resultContainer);
-            result.render();
+            // Fetching for another random movie and rendering its card
+            if (randomTypeChoice) {
+                // If user chose "random buttons" in start section
+                helper.getResource(`/get_data/${randomTypeChoice}`)
+                .then(data => {
+                    if (data.message) {
+                        // Displaying error message
+                        helper.renderErrorAlert(data.message);
+                    }
+                    else {
+                        // Removing any previous error messages
+                        helper.removeErrorAlert();
+                        // Creating movie card and rendering it
+                        let result = new MovieCard(data.image, 'poster', data.title, data.year, 'Add IMDB link?', data.id, resultContainer);
+                        result.render();
+                    }
+                });
+            } else {
+                // Showing spinner while JSON loads
+                const spinner = helper.renderSpinner(resultContainer);
+                // If user chose mood/genre
+                helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
+                .then(data => {
+                    if (data.message) {
+                        // Displaying error message
+                        helper.renderErrorAlert(data.message);
+                    }
+                    else {
+                        // Removing any previous error messages
+                        helper.removeErrorAlert();
+                        // Removing spinner
+                        spinner.remove();
+                        // Creating movie card and rendering it
+                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, resultContainer);
+                        result.render();
+                    }
+                });
+            }
+            
         });
     }
 
@@ -242,7 +292,10 @@ class MovieCard {
                 <h5 class="card-title">${this.title}</h5>
                 <h6 class="card-subtitle mb-2 text-muted">${this.year}</h6>
                 <p class="card-text">${this.descr}</p>
-                <div class="d-flex flex-row justify-content-center">
+                <button type="button" class="btn btn-outline-warning">
+                    <a href="https://www.imdb.com/title/${this.id}/" target="_blank">Details on IMDb</a>
+                </button>
+                <div class="d-flex flex-row justify-content-center mt-3">
                     <button class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id}>Add to Watchlist</button>
                     <button class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id}>Watched</button>
                 </div>

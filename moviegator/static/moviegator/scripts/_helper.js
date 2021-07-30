@@ -21,10 +21,47 @@ export function showWithAnimation(element, animationName) {
     element.style.animation = `${animationName} 2s linear 0s 1 normal forwards`;
 }
 
+// Renders error alert messages
+export function renderErrorAlert(message) {
+    const messageView = document.querySelector('#message');
+    messageView.style.display = 'block';
+    const errorElement = document.createElement('div');
+
+    errorElement.classList.add("alert", "alert-danger");
+    errorElement.role = "alert";
+    errorElement.innerHTML = message;
+    messageView.appendChild(errorElement);
+}
+
+// Removes error alerts
+export function removeErrorAlert() {
+    const messageView = document.querySelector('#message');
+    messageView.style.display = 'none';
+}
+
+
+// Rendering spinner animated img on loadng data inside a specified parent element
+export function renderSpinner(parent) {
+    const spinner = document.createElement('img');
+    spinner.src = '/static/moviegator/img/spinner.svg';
+    spinner.style.cssText = `
+        display: block;
+        padding-top: 10px;
+        margin: 0 auto;
+    `;
+    parent.appendChild(spinner);
+    return spinner;
+}
+
 
 // Function to make GET-requests
-const getResource = async (url) => {
-    const result = await fetch(url);
+export const getResource = async (url) => {
+    const result = await fetch(url, {
+        headers: {
+            // For Django is_ajax() method to work
+            "X-Requested-With": "XMLHttpRequest"
+        },
+    });
 
     if(!result.ok) { // in case the request was unsuccessful
         throw new Error(`Could not get resources from ${url}, status: ${result.status}`);
@@ -55,7 +92,8 @@ const postData = async (url, data) => {
     const result = await fetch(url, {
         method: 'POST',
         headers: {
-            'Content-type': 'application/json'
+            // For Django is_ajax() method to work
+            "X-Requested-With": "XMLHttpRequest"
         },
         body: data
     });

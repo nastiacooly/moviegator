@@ -10,4 +10,6 @@ urlpatterns = [
     path("register", views.register, name="register"),
     path("profile", views.profile_view, name="profile"),
     path('ratings', views.ratings_view, name="ratings"),
+    path('get_data/<parameter>', views.get_data),
+    path('get_data/<type>/<genre>', views.get_data_by_genre)
 ]
