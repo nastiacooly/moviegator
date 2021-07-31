@@ -20,12 +20,16 @@ from requests import status_codes
 
 from .models import User
 
-
-# Importing env variables
+# For importing env variables
 import os
 from dotenv import load_dotenv
 load_dotenv()
-API_KEY = os.getenv('API_KEY')
+
+# Make sure API key is set
+if not os.getenv("API_KEY"):
+    raise RuntimeError("API_KEY not set")
+else:
+    API_KEY = os.getenv('API_KEY')
 
 
 # For Third-party API calls
