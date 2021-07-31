@@ -20,11 +20,12 @@ from requests import status_codes
 
 from .models import User
 
-# Importing local settings (for private API-key, etc.)
-try:
-    from final.local_settings import *
-except ImportError:
-    pass  # No local_settings file
+
+# Importing env variables
+import os
+from dotenv import load_dotenv
+load_dotenv()
+API_KEY = os.getenv('API_KEY')
 
 
 # For Third-party API calls
@@ -118,6 +119,7 @@ def register(request):
         return render(request, "moviegator/register.html")
 
 
+@login_required
 def profile_view(request):
     """
     Renders profile page of signed in user
@@ -131,6 +133,7 @@ def profile_view(request):
         })
 
 
+@login_required
 def ratings_view(request):
     """
     Renders page with movies/shows rated by all users of the app
