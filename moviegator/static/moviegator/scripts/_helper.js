@@ -70,22 +70,6 @@ export const getResource = async (url) => {
     return await result.json();
 };
 
-/* TO USE LATER
-getResource('API url...')
-    .then(data => {
-        data.forEach(({src, alt, title, year, descr}) => { //деструктурируем объекты из массива api.json
-            new MovieCard( //передаем классу в качестве аргументов ключи объектов api.json
-                src, 
-                alt, 
-                title,
-                year, 
-                descr, 
-                "parentSelector"
-            ).render();
-        });
-    }); 
-*/
-
 
 // Function to make POST-requests
 const postData = async (url, data) => {
