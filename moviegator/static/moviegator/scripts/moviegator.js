@@ -17,7 +17,11 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionMood = document.querySelector('#section-mood'),
         sectionGenre = document.querySelector('#section-genre'),
         sectionResult = document.querySelector('#section-result'),
-        resultContainer = document.querySelector('.result-container');
+        resultContainer = document.querySelector('.result-container'),
+        sectionWatchlist = document.querySelector('#section-watchlist'),
+        sectionWatched = document.querySelector('#section-watched'),
+        sectionRated = document.querySelector('#section-rated'),
+        watchlistContainer = document.querySelector('.watchlist-container');
 
 
     // Navbar hide/show
@@ -81,6 +85,11 @@ document.addEventListener('DOMContentLoaded', () => {
             button.addEventListener('click', (e) => {
                 // Saving user's choice
                 randomTypeChoice = e.target.dataset.random;
+                if (randomTypeChoice === 'top-shows') {
+                    movieOrShowChoice = 'show';
+                } else {
+                    movieOrShowChoice = 'movie';
+                }
                 // Showing spinner while JSON loads
                 const spinner = helper.renderSpinner(resultContainer);
                 // Getting random movie from requested category
@@ -88,23 +97,32 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     if (data.message) {
                         // Displaying error message
-                        helper.renderErrorAlert(data.message);
+                        helper.renderMessageAlert(data.message, "danger");
                     }
                     else {
                         // Removing any previous error messages
-                        helper.removeErrorAlert();
+                        helper.removeMessageAlert();
                         // Removing spinner
                         spinner.remove();
                         // Creating movie card and rendering it
-                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.crew, data.id, resultContainer);
+                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.crew, data.id, movieOrShowChoice, resultContainer);
+                        // Hiding previous section
+                        helper.hideWithAnimation(sectionStart, 'slideToTop');
+                        // Showing result section
+                        helper.show(sectionResult);
+                        // Rendering movie card
                         result.render();
+                        // Setting status for result section
+                        sectionResult.dataset.status = "loaded";
                     }
-                    // Hiding previous section
-                    helper.hideWithAnimation(sectionStart, 'slideToTop');
-                    // Showing result section
-                    helper.show(sectionResult);
+                })
+                .then(() => {
+                    // Adding script for user actions
+                    let script = document.createElement('script');
+                    script.src = "/static/moviegator/scripts/user_actions.js";
+                    script.type = 'module';
+                    document.body.append(script);
                 });
-                
             });
 
         });
@@ -157,16 +175,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     if (data.message) {
                         // Displaying error message
-                        helper.renderErrorAlert(data.message);
+                        helper.renderMessageAlert(data.message, "danger");
                     }
                     else {
                         // Removing any previous error messages
-                        helper.removeErrorAlert();
+                        helper.removeMessageAlert();
                         // Removing spinner
                         spinner.remove();
                         // Creating movie card and rendering it
-                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, resultContainer);
+                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
                         result.render();
+                        // Setting status for result section
+                        sectionResult.dataset.status = "loaded";
                         
                     }
                 });
@@ -191,16 +211,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     if (data.message) {
                         // Displaying error message
-                        helper.renderErrorAlert(data.message);
+                        helper.renderMessageAlert(data.message, "danger");
                     }
                     else {
                         // Removing any previous error messages
-                        helper.removeErrorAlert();
+                        helper.removeMessageAlert();
                         // Removing spinner
                         spinner.remove();
                         // Creating movie card and rendering it
-                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, resultContainer);
+                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
                         result.render();
+                        // Setting status for result section
+                        sectionResult.dataset.status = "loaded";
                     }
                 });
             });
@@ -221,14 +243,16 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     if (data.message) {
                         // Displaying error message
-                        helper.renderErrorAlert(data.message);
+                        helper.renderMessageAlert(data.message, "danger");
                     }
                     else {
                         // Removing any previous error messages
-                        helper.removeErrorAlert();
+                        helper.removeMessageAlert();
                         // Creating movie card and rendering it
-                        let result = new MovieCard(data.image, 'poster', data.title, data.year, 'Add IMDB link?', data.id, resultContainer);
+                        let result = new MovieCard(data.image, 'poster', data.title, data.year, 'Add IMDB link?', data.id, movieOrShowChoice, resultContainer);
                         result.render();
+                        // Setting status for result section
+                        sectionResult.dataset.status = "loaded";
                     }
                 });
             } else {
@@ -239,16 +263,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 .then(data => {
                     if (data.message) {
                         // Displaying error message
-                        helper.renderErrorAlert(data.message);
+                        helper.renderMessageAlert(data.message, "danger");
                     }
                     else {
                         // Removing any previous error messages
-                        helper.removeErrorAlert();
+                        helper.removeMessageAlert();
                         // Removing spinner
                         spinner.remove();
                         // Creating movie card and rendering it
-                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, resultContainer);
+                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
                         result.render();
+                        // Setting status for result section
+                        sectionResult.dataset.status = "loaded";
                     }
                 });
             }
@@ -257,18 +283,48 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
+    // See watchlist
+    const watchlistBtn = document.querySelector('button[data-profile="watchlist"]');
+    if (watchlistBtn) {
+        watchlistBtn.addEventListener('click', (e) => {
+            // Show watchlist and hide other section
+            helper.show(sectionWatchlist);
+            helper.hide(sectionWatched);
+            helper.hode(sectionRated);
+            // Getting watchlist from server
+            helper.getResource('get_watchlist')
+            .then(data => {
+                if (data.message) {
+                    // Rendering error alert
+                    helper.renderMessageAlert(data.message, "danger");
+                } else {
+                    // Removing any previous error messages
+                    helper.removeMessageAlert();
+                    // Creating movie cards and rendering them
+                    data.forEach(item => {
+                        let result = new MovieCard(item.image, 'poster', item.title, item.year, item.details, data.imdb_id, movieOrShowChoice, watchlistContainer);
+                        result.render();
+                    });
+                }
+
+            });
+        });
+    }
+    
+
 });
 
 
 // Class for movie card
 class MovieCard {
-    constructor(src, alt, title, year, descr, id, parentElement, ...classes) {
+    constructor(src, alt, title, year, descr, id, type, parentElement, ...classes) {
         this.src = src;
         this.alt = alt;
         this.title = title;
         this.year = year;
         this.descr = descr;
         this.id = id;
+        this.type = type;
         this.classes = classes;
         this.parent = parentElement;
         
@@ -296,8 +352,8 @@ class MovieCard {
                     <a href="https://www.imdb.com/title/${this.id}/" target="_blank">Details on IMDb</a>
                 </button>
                 <div class="d-flex flex-row justify-content-center mt-3">
-                    <button class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id}>Add to Watchlist</button>
-                    <button class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id}>Watched</button>
+                    <button class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id} data-action="watchlist" data-type=${this.type}>Add to Watchlist</button>
+                    <button class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>Watched</button>
                 </div>
             </div>
         `;

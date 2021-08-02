@@ -10,7 +10,7 @@ from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
 from django.shortcuts import render, redirect
 from django.urls import reverse
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views import generic
 from django.db.models import Count
 from django.core.paginator import Paginator
@@ -18,7 +18,7 @@ from django.db import IntegrityError
 from django.db.models import Exists, OuterRef
 from requests import status_codes
 
-from .models import User
+from .models import User, MovieDB, UserActions
 
 # For importing env variables
 import os
@@ -67,6 +67,7 @@ in_theatres = 'InTheaters/'
 title_details = 'Title/'
 
 
+@ensure_csrf_cookie
 def index(request):
     return render(request, "moviegator/index.html")
 
@@ -184,3 +185,61 @@ def get_data_by_genre(request, type, genre):
             return JsonResponse({"message": "Sorry, something went wrong. Please, try again."})
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required
+def add_to_watchlist(request):
+    # Ensure POST-request is made by Javascript (fetch)
+    if request.method == "POST" and request.is_ajax():
+        # Getting JSON data
+        data = json.loads(request.body)
+        # Add movie/show details to MovieDB of this app or get movie (if already in MovieDB)
+        try:
+            imdb_id = data['imdb_id']
+            type = data['type']
+            title = data['title']
+            year = data['year']
+            image = data['image']
+            details = data['details']
+
+            movie = MovieDB(
+                imdb_id=imdb_id,
+                type=type,
+                title=title,
+                year=year,
+                image=image,
+                details=details
+            )
+
+            movie.save()
+
+        except IntegrityError as e:
+            movie = MovieDB.objects.get(imdb_id=data.imdb_id)
+
+        # Adding to watchlist
+        obj, created = UserActions.objects.update_or_create(
+            user=request.user, 
+            movie=movie,
+            defaults={'watchlist': True, 'watched': False},
+        )
+        if obj:
+            return JsonResponse({'message': 'Successfully added to your watchlist'})
+        else:
+            return JsonResponse({'error': 'Sorry, something went wrong'})
+    
+    # In case request was GET or not AJAX
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required
+def get_watchlist(request):
+    # Ensure request is AJAX
+    if request.is_ajax():
+        try:
+            watchlist = UserActions.objects.filter(user=request.user, watchlist=True)
+            details = watchlist.movie_details
+            return JsonResponse(details)
+        except UserActions.DoesNotExist:
+            return JsonResponse({'message': 'Watchlist is empty'})
+

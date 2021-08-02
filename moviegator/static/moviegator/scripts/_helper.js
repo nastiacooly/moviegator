@@ -22,19 +22,19 @@ export function showWithAnimation(element, animationName) {
 }
 
 // Renders error alert messages
-export function renderErrorAlert(message) {
+export function renderMessageAlert(message, type) {
     const messageView = document.querySelector('#message');
     messageView.style.display = 'block';
     const errorElement = document.createElement('div');
 
-    errorElement.classList.add("alert", "alert-danger");
+    errorElement.classList.add("alert", `alert-${type}`);
     errorElement.role = "alert";
     errorElement.innerHTML = message;
     messageView.appendChild(errorElement);
 }
 
 // Removes error alerts
-export function removeErrorAlert() {
+export function removeMessageAlert() {
     const messageView = document.querySelector('#message');
     messageView.style.display = 'none';
 }
@@ -72,29 +72,17 @@ export const getResource = async (url) => {
 
 
 // Function to make POST-requests
-const postData = async (url, data) => {
+export const postData = async (url, data, csrftoken) => {
     const result = await fetch(url, {
         method: 'POST',
         headers: {
             // For Django is_ajax() method to work
-            "X-Requested-With": "XMLHttpRequest"
+            "X-Requested-With": "XMLHttpRequest",
+            // Securing POST-request
+            'X-CSRFToken': csrftoken
         },
         body: data
     });
 
     return await result.json();
 };
-
-/* TO USE LATER
-postData('django url', json)
-    .then(data => { //действия при успешности запроса
-        console.log(data); //показываем полученный от сервера ответ для проверки
-        ...
-    })
-    .catch(() => { //действия при неуспешности запроса
-        ...
-    })
-    .finally(() => { //действия при любом исходе запроса
-        form.reset(); //например, очистка формы на странице
-    });
-*/

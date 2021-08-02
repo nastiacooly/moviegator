@@ -8,7 +8,7 @@ class User(AbstractUser):
 
 
 class MovieDB(models.Model):
-    imdb_id = models.CharField(max_length=18, helpt_text="ID of title on IMDb site", blank=False, unique=True, editable=False)
+    imdb_id = models.CharField(max_length=18, help_text="ID of title on IMDb site", blank=False, unique=True, editable=False)
 
     TYPES = (
         ('m', 'movie'),
@@ -21,11 +21,29 @@ class MovieDB(models.Model):
     image = models.URLField(max_length=1024, help_text='URL for poster from IMDb', blank=False)
     details = models.CharField(max_length=512, help_text="Additional details about director, cast, etc.")
 
+    def serialize(self):
+        return {
+            "id": self.pk,
+            "imdb_id": self.imdb_id,
+            "type": self.type,
+            "title": self.title,
+            "year": self.year,
+            "image": self.image,
+            "details": self.details,
+        }
 
-class userActions(models.Model):
+
+class UserActions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
-    movie_id = models.ForeignKey(MovieDB, on_delete=models.CASCADE, blank=False)
+    movie = models.OneToOneField(MovieDB, on_delete=models.CASCADE, blank=False, related_name="movie_details")
     watchlist = models.BooleanField(default=False)
     watched = models.BooleanField(default=False)
-    RATINGS = [None, 1, 2, 3, 4, 5]
-    rating = models.IntegerField(max_length=1, choices=RATINGS, help_text="Rate a movie / show from 1 to 5", default=None)
+    RATINGS = (
+        ('0', 'not rated'),
+        ('1', '1-star'),
+        ('2', '2-star'),
+        ('3', '3-star'),
+        ('4', '4-star'),
+        ('5', '5-star')
+    )
+    rating = models.CharField(max_length=1, choices=RATINGS, help_text="Rate a movie / show from 1 to 5", default='0')
