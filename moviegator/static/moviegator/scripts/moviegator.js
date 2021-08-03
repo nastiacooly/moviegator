@@ -6,6 +6,7 @@ import * as helper from "./_helper.js";
 let movieOrShowChoice = '';
 let genreChoice = '';
 let randomTypeChoice = '';
+const userActionsScriptSrc = "/static/moviegator/scripts/user_actions.js";
 
 
 // Dynamic page scripts
@@ -55,259 +56,307 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // Start choice (Movie or TV Show)
-    const firstChoiceButtons = sectionStart.querySelectorAll('button[data-type]');
-    if (firstChoiceButtons) {
-        firstChoiceButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                // Disabling not clicked button
-                if (e.target === firstChoiceButtons[0]) {
-                    firstChoiceButtons[1].setAttribute('disabled', true);
-                    button.removeAttribute('disabled');
-                } else if (e.target === firstChoiceButtons[1]) {
-                    firstChoiceButtons[0].setAttribute('disabled', true);
-                    button.removeAttribute('disabled');
-                }
-                // Storing user's choice to variable
-                movieOrShowChoice = e.target.dataset.type;
-                // Hiding current section's content and showing next section's content
-                helper.hideWithAnimation(sectionStart, 'disappear');
-                helper.showWithAnimation(sectionMoodGenre, 'appear');
-            });
-        });
-    }
-
-
-    // Start choice (for Random)
-    const randomButtons = sectionStart.querySelectorAll('button[data-random]');
-    if (randomButtons) {
-        randomButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                // Saving user's choice
-                randomTypeChoice = e.target.dataset.random;
-                if (randomTypeChoice === 'top-shows') {
-                    movieOrShowChoice = 'show';
-                } else {
-                    movieOrShowChoice = 'movie';
-                }
-                // Showing spinner while JSON loads
-                const spinner = helper.renderSpinner(resultContainer);
-                // Getting random movie from requested category
-                helper.getResource(`/get_data/${randomTypeChoice}`)
-                .then(data => {
-                    if (data.message) {
-                        // Displaying error message
-                        helper.renderMessageAlert(data.message, "danger");
+    // Start section
+    if (sectionStart) {
+        // Start choice (Movie or TV Show)
+        const firstChoiceButtons = sectionStart.querySelectorAll('button[data-type]');
+        if (firstChoiceButtons) {
+            firstChoiceButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // Disabling not clicked button
+                    if (e.target === firstChoiceButtons[0]) {
+                        firstChoiceButtons[1].setAttribute('disabled', true);
+                        button.removeAttribute('disabled');
+                    } else if (e.target === firstChoiceButtons[1]) {
+                        firstChoiceButtons[0].setAttribute('disabled', true);
+                        button.removeAttribute('disabled');
                     }
-                    else {
-                        // Removing any previous error messages
-                        helper.removeMessageAlert();
-                        // Removing spinner
-                        spinner.remove();
-                        // Creating movie card and rendering it
-                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.crew, data.id, movieOrShowChoice, resultContainer);
-                        // Hiding previous section
-                        helper.hideWithAnimation(sectionStart, 'slideToTop');
-                        // Showing result section
-                        helper.show(sectionResult);
-                        // Rendering movie card
-                        result.render();
-                        // Setting status for result section
-                        sectionResult.dataset.status = "loaded";
-                    }
-                })
-                .then(() => {
-                    // Adding script for user actions
-                    let script = document.createElement('script');
-                    script.src = "/static/moviegator/scripts/user_actions.js";
-                    script.type = 'module';
-                    document.body.append(script);
+                    // Storing user's choice to variable
+                    movieOrShowChoice = e.target.dataset.type;
+                    // Hiding current section's content and showing next section's content
+                    helper.hideWithAnimation(sectionStart, 'disappear');
+                    helper.showWithAnimation(sectionMoodGenre, 'appear');
                 });
             });
+        }
 
-        });
+
+        // Start choice (for Random)
+        const randomButtons = sectionStart.querySelectorAll('button[data-random]');
+        if (randomButtons) {
+            randomButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // Saving user's choice
+                    randomTypeChoice = e.target.dataset.random;
+                    if (randomTypeChoice === 'top-shows') {
+                        movieOrShowChoice = 'show';
+                    } else {
+                        movieOrShowChoice = 'movie';
+                    }
+                    // Hiding previous section
+                    helper.hideWithAnimation(sectionStart, 'slideToTop');
+                    // Showing result section
+                    helper.show(sectionResult);
+                    // Showing spinner while JSON loads
+                    const spinner = helper.renderSpinner(resultContainer);
+                    // Getting random movie from requested category
+                    helper.getResource(`/get_data/${randomTypeChoice}`)
+                    .then(data => {
+                        if (data.message) {
+                            // Displaying error message
+                            helper.renderMessageAlert(data.message, "danger");
+                        }
+                        else {
+                            // Removing any previous error messages
+                            helper.removeMessageAlert();
+                            // Removing spinner
+                            spinner.remove();
+                            // Creating movie card and rendering it
+                            let result = new MovieCard(data.image, 'poster', data.title, data.year, data.stars, data.id, movieOrShowChoice, resultContainer);
+                            // Rendering movie card
+                            result.render();
+                        }
+                    })
+                    .then(() => {
+                        // Setting status for result section
+                        sectionResult.dataset.status = "loaded";
+                        // Adding script for user actions
+                        helper.append_script(userActionsScriptSrc);
+                    });
+                });
+
+            });
+        }
     }
 
 
     // 'Mood or genre' choice
-    const moodBtn = sectionMoodGenre.querySelector('button[data-base="mood"]');
-    const genreBtn = sectionMoodGenre.querySelector('button[data-base="genre"]');
+    if (sectionMoodGenre){
+        const moodBtn = sectionMoodGenre.querySelector('button[data-base="mood"]');
+        const genreBtn = sectionMoodGenre.querySelector('button[data-base="genre"]');
 
-    if(moodBtn) {
-        // Clicking 'mood' button shows section for mood choice
-        moodBtn.addEventListener('click', () => {
-            // Hiding current section
-            helper.hideWithAnimation(sectionMoodGenre, 'disappear');
-            // Showing next section
-            helper.showWithAnimation(sectionMood, 'appear');
-        });
+        if(moodBtn) {
+            // Clicking 'mood' button shows section for mood choice
+            moodBtn.addEventListener('click', () => {
+                // Hiding current section
+                helper.hideWithAnimation(sectionMoodGenre, 'disappear');
+                // Showing next section
+                helper.showWithAnimation(sectionMood, 'appear');
+            });
+        }
+
+        if(genreBtn) {
+            // Clicking 'genre' button shows section for genre choice
+            genreBtn.addEventListener('click', () => {
+                // Hiding current section
+                helper.hideWithAnimation(sectionMoodGenre, 'disappear');
+                // Showing next section
+                helper.showWithAnimation(sectionGenre, 'appear');
+            });
+        }
     }
-
-    if(genreBtn) {
-        // Clicking 'genre' button shows section for genre choice
-        genreBtn.addEventListener('click', () => {
-            // Hiding current section
-            helper.hideWithAnimation(sectionMoodGenre, 'disappear');
-            // Showing next section
-            helper.showWithAnimation(sectionGenre, 'appear');
-        });
-    }
-
     
+
     // Genre choice (based on mood or genre itself)
-    const moodButtons = sectionMood.querySelectorAll('button[data-genre]');
-    const genreButtons = sectionGenre.querySelectorAll('button[data-genre]');
+    if (sectionMood || sectionGenre) {
+        const moodButtons = sectionMood.querySelectorAll('button[data-genre]');
+        const genreButtons = sectionGenre.querySelectorAll('button[data-genre]');
 
-    if (moodButtons) {
-        // Choosing mood (clicking button) shows section with movie recommendation
-        moodButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                // Saving genre according to mood choice
-                genreChoice = e.target.dataset.genre;
-                // Showing spinner while JSON loads
-                const spinner = helper.renderSpinner(resultContainer);
-                // Hiding current section
-                helper.hideWithAnimation(sectionMood, 'disappear');
-                // Showing section with recommendation
-                helper.showWithAnimation(sectionResult, 'appear');
-                // Getting random movie/show for chosen mood (genre)
-                helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
-                .then(data => {
-                    if (data.message) {
-                        // Displaying error message
-                        helper.renderMessageAlert(data.message, "danger");
-                    }
-                    else {
-                        // Removing any previous error messages
-                        helper.removeMessageAlert();
-                        // Removing spinner
-                        spinner.remove();
-                        // Creating movie card and rendering it
-                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
-                        result.render();
+        if (moodButtons) {
+            // Choosing mood (clicking button) shows section with movie recommendation
+            moodButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // Saving genre according to mood choice
+                    genreChoice = e.target.dataset.genre;
+                    // Hiding current section
+                    helper.hideWithAnimation(sectionMood, 'disappear');
+                    // Showing section with recommendation
+                    helper.showWithAnimation(sectionResult, 'appear');
+                    // Showing spinner while JSON loads
+                    const spinner = helper.renderSpinner(resultContainer);
+                    // Getting random movie/show for chosen mood (genre)
+                    helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
+                    .then(data => {
+                        if (data.message) {
+                            // Displaying error message
+                            helper.renderMessageAlert(data.message, "danger");
+                        }
+                        else {
+                            // Removing any previous error messages
+                            helper.removeMessageAlert();
+                            // Removing spinner
+                            spinner.remove();
+                            // Creating movie card and rendering it
+                            let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
+                            result.render();                            
+                        }
+                    })
+                    .then(() => {
                         // Setting status for result section
                         sectionResult.dataset.status = "loaded";
-                        
-                    }
+                        // Adding script for user actions
+                        helper.append_script(userActionsScriptSrc);
+                    });
                 });
             });
-        });
-    }
-
-    if (genreButtons) {
-        // Choosing mood (clicking button) shows section with movie recommendation
-        genreButtons.forEach(button => {
-            button.addEventListener('click', (e) => {
-                // Saving genre according to mood choice
-                genreChoice = e.target.dataset.genre;
-                // Showing spinner while JSON loads
-                const spinner = helper.renderSpinner(resultContainer);
-                // Hiding current section
-                helper.hideWithAnimation(sectionGenre, 'disappear');
-                // Showing section with recommendation
-                helper.showWithAnimation(sectionResult, 'appear');
-                // Getting random movie/show for chosen genre
-                helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
-                .then(data => {
-                    if (data.message) {
-                        // Displaying error message
-                        helper.renderMessageAlert(data.message, "danger");
-                    }
-                    else {
-                        // Removing any previous error messages
-                        helper.removeMessageAlert();
-                        // Removing spinner
-                        spinner.remove();
-                        // Creating movie card and rendering it
-                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
-                        result.render();
+        }
+    
+        if (genreButtons) {
+            // Choosing mood (clicking button) shows section with movie recommendation
+            genreButtons.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // Saving genre according to mood choice
+                    genreChoice = e.target.dataset.genre;
+                    // Hiding current section
+                    helper.hideWithAnimation(sectionGenre, 'disappear');
+                    // Showing section with recommendation
+                    helper.showWithAnimation(sectionResult, 'appear');
+                    // Showing spinner while JSON loads
+                    const spinner = helper.renderSpinner(resultContainer);
+                    // Getting random movie/show for chosen genre
+                    helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
+                    .then(data => {
+                        if (data.message) {
+                            // Displaying error message
+                            helper.renderMessageAlert(data.message, "danger");
+                        }
+                        else {
+                            // Removing any previous error messages
+                            helper.removeMessageAlert();
+                            // Removing spinner
+                            spinner.remove();
+                            // Creating movie card and rendering it
+                            let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
+                            result.render();
+                        }
+                    })
+                    .then(() => {
                         // Setting status for result section
                         sectionResult.dataset.status = "loaded";
-                    }
+                        // Adding script for user actions
+                        helper.append_script(userActionsScriptSrc);
+                    });
                 });
             });
-        });
+        }
     }
+    
 
     // More results for user's preferences
-    const moreButton = sectionResult.querySelector('button[data-action="more"]');
-    if (moreButton) {
-        moreButton.addEventListener('click', (e) => {
-            // Remove previous result element
-            const previousResult = sectionResult.querySelector('div.card');
-            previousResult.remove();
-            // Fetching for another random movie and rendering its card
-            if (randomTypeChoice) {
-                // If user chose "random buttons" in start section
-                helper.getResource(`/get_data/${randomTypeChoice}`)
-                .then(data => {
-                    if (data.message) {
-                        // Displaying error message
-                        helper.renderMessageAlert(data.message, "danger");
-                    }
-                    else {
-                        // Removing any previous error messages
-                        helper.removeMessageAlert();
-                        // Creating movie card and rendering it
-                        let result = new MovieCard(data.image, 'poster', data.title, data.year, 'Add IMDB link?', data.id, movieOrShowChoice, resultContainer);
-                        result.render();
+    if (sectionResult) {
+        const moreButton = sectionResult.querySelector('button[data-action="more"]');
+        if (moreButton) {
+            moreButton.addEventListener('click', (e) => {
+                // Remove previous result element
+                const previousResult = sectionResult.querySelector('div.card');
+                previousResult.remove();
+                // Fetching for another random movie and rendering its card
+                if (randomTypeChoice) {
+                    // If user chose "random buttons" in start section
+                    helper.getResource(`/get_data/${randomTypeChoice}`)
+                    .then(data => {
+                        if (data.message) {
+                            // Displaying error message
+                            helper.renderMessageAlert(data.message, "danger");
+                        }
+                        else {
+                            // Removing any previous error messages
+                            helper.removeMessageAlert();
+                            // Creating movie card and rendering it
+                            let result = new MovieCard(data.image, 'poster', data.title, data.year, data.crew, data.id, movieOrShowChoice, resultContainer);
+                            result.render();
+                            // Setting status for result section
+                            sectionResult.dataset.status = "loaded";
+                        }
+                    })
+                    .then(() => {
+                        // Setting status for result section
+                        if (sectionResult.dataset.status === "loaded") {
+                            // Adding script for user actions
+                            helper.append_script(userActionsScriptSrc);
+                        }
+                    });
+                } else {
+                    // Showing spinner while JSON loads
+                    const spinner = helper.renderSpinner(resultContainer);
+                    // If user chose mood/genre
+                    helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
+                    .then(data => {
+                        if (data.message) {
+                            // Displaying error message
+                            helper.renderMessageAlert(data.message, "danger");
+                        }
+                        else {
+                            // Removing any previous error messages
+                            helper.removeMessageAlert();
+                            // Removing spinner
+                            spinner.remove();
+                            // Creating movie card and rendering it
+                            let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
+                            result.render();
+                        }
+                    })
+                    .then(() => {
                         // Setting status for result section
                         sectionResult.dataset.status = "loaded";
-                    }
-                });
-            } else {
-                // Showing spinner while JSON loads
-                const spinner = helper.renderSpinner(resultContainer);
-                // If user chose mood/genre
-                helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
-                .then(data => {
-                    if (data.message) {
-                        // Displaying error message
-                        helper.renderMessageAlert(data.message, "danger");
-                    }
-                    else {
-                        // Removing any previous error messages
-                        helper.removeMessageAlert();
-                        // Removing spinner
-                        spinner.remove();
-                        // Creating movie card and rendering it
-                        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
-                        result.render();
-                        // Setting status for result section
-                        sectionResult.dataset.status = "loaded";
-                    }
-                });
-            }
-            
-        });
+                        // Adding script for user actions
+                        helper.append_script(userActionsScriptSrc);
+
+                    });
+                }
+            });
+        }
     }
 
 
     // See watchlist
     const watchlistBtn = document.querySelector('button[data-profile="watchlist"]');
     if (watchlistBtn) {
+        // In case watchlist section isn't already visible
         watchlistBtn.addEventListener('click', (e) => {
+            // Getting watchlist from server (only if it hasn't been rendered before)
+            if (watchlistContainer.childElementCount === 0) {
+                helper.getResource('get_watchlist')
+                .then(data => {
+                    console.log(data);
+                    if (data.message) {
+                        // Rendering error alert
+                        helper.renderMessageAlert(data.message, "danger");
+                    } else {
+                        // Removing any previous error messages
+                        helper.removeMessageAlert();
+                        // Creating movie cards and rendering them
+                        data.forEach(item => {
+                            console.log(item);
+                            // Setting type of title
+                            let type = '';
+                            if (item.type === "m") {
+                                type = 'movie';
+                            } else if (item.type === "s") {
+                                type = "show";
+                            }
+                            let movie = new MovieCard(item.image, 'poster', item.title, item.year, item.details, item.imdb_id, type, watchlistContainer);
+                            movie.render();
+                        });
+                    }
+                });
+            }
             // Show watchlist and hide other section
             helper.show(sectionWatchlist);
             helper.hide(sectionWatched);
-            helper.hode(sectionRated);
-            // Getting watchlist from server
-            helper.getResource('get_watchlist')
-            .then(data => {
-                if (data.message) {
-                    // Rendering error alert
-                    helper.renderMessageAlert(data.message, "danger");
-                } else {
-                    // Removing any previous error messages
-                    helper.removeMessageAlert();
-                    // Creating movie cards and rendering them
-                    data.forEach(item => {
-                        let result = new MovieCard(item.image, 'poster', item.title, item.year, item.details, data.imdb_id, movieOrShowChoice, watchlistContainer);
-                        result.render();
-                    });
-                }
+            helper.hide(sectionRated);
+        });
+    }
 
-            });
+
+    // See list of watched movies
+    const watchedBtn = document.querySelector('button[data-profile="watched"]');
+    if (watchedBtn) {
+        watchedBtn.addEventListener('click', () => {
+            // Show watched and hide other section
+            helper.show(sectionWatched);
+            helper.hide(sectionWatchlist);
+            helper.hide(sectionRated);
         });
     }
     
@@ -334,7 +383,7 @@ class MovieCard {
         const movieCardElement = document.createElement('div');
 
         if (this.classes.length === 0) {
-            this.classes = ['card', 'text-center', 'text-white', 'mt-2'];
+            this.classes = ['card', 'text-center', 'text-white', 'mt-5'];
             this.classes.forEach(className => movieCardElement.classList.add(className)); 
             //adding default class to the element in case they were not specified
         } else {
@@ -346,14 +395,14 @@ class MovieCard {
             <img src=${this.src} class="card-img-top" alt=${this.alt}>
             <div class="card-body">
                 <h5 class="card-title">${this.title}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">${this.year}</h6>
+                <h6 class="card-subtitle mb-2">${this.year}</h6>
                 <p class="card-text">${this.descr}</p>
                 <button type="button" class="btn btn-outline-warning">
                     <a href="https://www.imdb.com/title/${this.id}/" target="_blank">Details on IMDb</a>
                 </button>
                 <div class="d-flex flex-row justify-content-center mt-3">
-                    <button class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id} data-action="watchlist" data-type=${this.type}>Add to Watchlist</button>
-                    <button class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>Watched</button>
+                    <button title="Add to Watchlist" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watchlist" data-type=${this.type}>&#43;</button>
+                    <button title="Mark as Watched" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>&#10003;</button>
                 </div>
             </div>
         `;

@@ -214,7 +214,8 @@ def add_to_watchlist(request):
             movie.save()
 
         except IntegrityError as e:
-            movie = MovieDB.objects.get(imdb_id=data.imdb_id)
+            movie = MovieDB.objects.get(imdb_id=data['imdb_id'])
+            return JsonResponse({'error': 'Already in your watchlist'})
 
         # Adding to watchlist
         obj, created = UserActions.objects.update_or_create(
@@ -236,10 +237,14 @@ def add_to_watchlist(request):
 def get_watchlist(request):
     # Ensure request is AJAX
     if request.is_ajax():
+        watchlist_to_render = []
         try:
             watchlist = UserActions.objects.filter(user=request.user, watchlist=True)
-            details = watchlist.movie_details
-            return JsonResponse(details)
+            for obj in watchlist:
+                item = obj.movie
+                watchlist_to_render.append(item.serialize())
+            
+            return JsonResponse(watchlist_to_render, safe=False)
         except UserActions.DoesNotExist:
             return JsonResponse({'message': 'Watchlist is empty'})
 

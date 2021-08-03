@@ -11,7 +11,7 @@
         {% if user.is_authenticated %}
 
         <!--User's info section -->
-        <section class="text-center" id="section-user">
+        <div class="text-center" id="section-user">
 
             <div class="container text-center d-flex flex-column">
                 <div class="px-5">
@@ -46,7 +46,7 @@
 
                         <h1>Your watchlist</h1>
 
-                        <div class="watchlist-container d-flex flex-row px-5">
+                        <div class="watchlist-container d-flex flex-row flex-wrap justify-content-around">
                             
                         </div>
 
@@ -87,11 +87,11 @@
                 </div>
             </section>
 
-        </section>
+        </div>
 
         {% else %}
 
-        <section class="text-center" id="section-user">
+        <div class="text-center" id="section-user">
 
             <h3>You should be signed in to see your profile</h3>
 
@@ -104,7 +104,7 @@
                 </button>
             </div>
 
-        </section>
+        </div>
 
         {% endif %}
 

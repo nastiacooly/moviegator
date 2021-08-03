@@ -36,6 +36,7 @@ if (sectionResult.style.display === 'block' && sectionResult.dataset.status === 
                 details = document.querySelector('.card-text'),
                 imdb_id = e.target.dataset.id,
                 type = e.target.dataset.type[0];
+                
             const movie_details = {
                 imdb_id: imdb_id,
                 type: type,
@@ -52,13 +53,13 @@ if (sectionResult.style.display === 'block' && sectionResult.dataset.status === 
                 if (data.error) {
                     // Render error message
                     helper.renderMessageAlert(data.error, 'danger');
+                    // Remove error mssg after some time
+                    setTimeout(helper.removeMessageAlert, 5000);
                 } else if (data.message) {
                     // Remove previous messages if any
                     helper.removeMessageAlert();
                     // Showing successful result message
                     helper.renderMessageAlert(data.message, 'success');
-                    // Add 'check' symbol to button
-                    e.target.TextContent = "&#1004;";
                     // Remove success mssg after some time
                     setTimeout(helper.removeMessageAlert, 3000);
                 }

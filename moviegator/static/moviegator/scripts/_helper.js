@@ -86,3 +86,12 @@ export const postData = async (url, data, csrftoken) => {
 
     return await result.json();
 };
+
+
+// Function to add script to a page
+export function append_script(src) {
+    let script = document.createElement('script');
+    script.src = src;
+    script.type = 'module';
+    document.body.append(script);
+}

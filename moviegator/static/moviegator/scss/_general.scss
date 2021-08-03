@@ -3,6 +3,7 @@ body {
     position: relative;
     color: white;
     font-family: 'Josefin Sans', sans-serif;
+    overflow-x: hidden;
 }
 
 .navbar {
@@ -38,7 +39,6 @@ body {
 .card {
     background-color: rgba(0, 0, 0, 0) !important;
     border: none !important;
-    animation: scale 1.5s linear 0s 1 normal forwards;
     &>img {
         max-height: 30vh !important;
         object-fit: contain !important;
@@ -68,23 +68,25 @@ a, a:hover {
 section {
     @include section-general;
     &.inner-section {
-        position: absolute;
-        top: 25rem;
+        position: relative;
+        top: 2rem;
         height: auto;
         width: 100vw;
         z-index: 6;
+        background-color: transparent;
+        padding-bottom: 2rem;
     }
     &>div.container.d-flex {
         height: 100%;
     }
     &#section {
-        &-login, &-register, &-start, &-mood-genre, &-user {
+        &-login, &-register, &-start, &-mood-genre {
             background: $linear-bg-light;
         }
         &-welcome, &-mood, &-genre, &-result, &-ratings {
             background: $linear-bg-dark;
         }
-        &-user, &-ratings {
+        &-ratings {
             z-index: 5;
             padding-top: 5rem;
         }
@@ -108,6 +110,30 @@ section {
         &-result {
             z-index: 1;
             padding-top: 10rem;
+            .card {
+                animation: scale 1.5s linear 0s 1 normal forwards;
+            }
         }
     }
+}
+
+div {
+    &#section-user {
+        position: absolute;
+        background: black;
+        top: 0;
+        padding-top: 5rem;
+        padding-bottom: 5rem;
+        min-height: 100vh;
+        width: 100vw;
+        z-index: 5;
+        .card-text {
+            max-width: 210px !important;
+            height: 80px !important;
+        }
+    }
+}
+
+.watchlist-container {
+    max-width: 100%;
 }
