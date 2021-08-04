@@ -13,5 +13,6 @@ urlpatterns = [
     path('get_data/<parameter>', views.get_data),
     path('get_data/<type>/<genre>', views.get_data_by_genre),
     path('add_to_watchlist', views.add_to_watchlist),
-    path('get_watchlist', views.get_watchlist)
+    path('get_watchlist', views.get_watchlist),
+    path('remove_from_watchlist', views.remove_from_watchlist),
 ]

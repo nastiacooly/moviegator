@@ -336,9 +336,13 @@ document.addEventListener('DOMContentLoaded', () => {
                                 type = "show";
                             }
                             let movie = new MovieCard(item.image, 'poster', item.title, item.year, item.details, item.imdb_id, type, watchlistContainer);
-                            movie.render();
+                            movie.render("for_watchlist");
                         });
                     }
+                })
+                .then(() => {
+                    // Adding script for user actions
+                    helper.append_script(userActionsScriptSrc);
                 });
             }
             // Show watchlist and hide other section
@@ -379,7 +383,7 @@ class MovieCard {
         
     }
 
-    render() {
+    render(condition="for_result") {
         const movieCardElement = document.createElement('div');
 
         if (this.classes.length === 0) {
@@ -390,8 +394,9 @@ class MovieCard {
             this.classes.forEach(className => movieCardElement.classList.add(className)); 
             //adding specified classes to the element
         }
-        
-        movieCardElement.innerHTML = `
+
+        if (condition === "for_result") {
+            movieCardElement.innerHTML = `
             <img src=${this.src} class="card-img-top" alt=${this.alt}>
             <div class="card-body">
                 <h5 class="card-title">${this.title}</h5>
@@ -405,7 +410,57 @@ class MovieCard {
                     <button title="Mark as Watched" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>&#10003;</button>
                 </div>
             </div>
-        `;
+            `;
+        } else if (condition === "for_watchlist") {
+            movieCardElement.innerHTML = `
+            <img src=${this.src} class="card-img-top" alt=${this.alt}>
+            <div class="card-body">
+                <h5 class="card-title">${this.title}</h5>
+                <h6 class="card-subtitle mb-2">${this.year}</h6>
+                <p class="card-text">${this.descr}</p>
+                <button type="button" class="btn btn-outline-warning">
+                    <a href="https://www.imdb.com/title/${this.id}/" target="_blank">Details on IMDb</a>
+                </button>
+                <div class="d-flex flex-row justify-content-center mt-3">
+                    <button title="Remove from Watchlist" class="btn btn-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watchlist" data-type=${this.type}>&#8722;</button>
+                    <button title="Mark as Watched" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>&#10003;</button>
+                </div>
+            </div>
+            `;
+        } else if (condition === "for_watched") {
+            movieCardElement.innerHTML = `
+            <img src=${this.src} class="card-img-top" alt=${this.alt}>
+            <div class="card-body">
+                <h5 class="card-title">${this.title}</h5>
+                <h6 class="card-subtitle mb-2">${this.year}</h6>
+                <p class="card-text">${this.descr}</p>
+                <button type="button" class="btn btn-outline-warning">
+                    <a href="https://www.imdb.com/title/${this.id}/" target="_blank">Details on IMDb</a>
+                </button>
+                <div class="d-flex flex-row justify-content-center mt-3">
+                    <button title="Rate This Title" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="rate" data-type=${this.type}>Rate</button>
+                    <button title="Mark as Not Watched" class="btn btn-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>&#10003;</button>
+                </div>
+            </div>
+            `;
+        } else if (condition === "for_rated") {
+            movieCardElement.innerHTML = `
+            <img src=${this.src} class="card-img-top" alt=${this.alt}>
+            <div class="card-body">
+                <h5 class="card-title">${this.title}</h5>
+                <h6 class="card-subtitle mb-2">${this.year}</h6>
+                <p class="card-text">${this.descr}</p>
+                <button type="button" class="btn btn-outline-warning">
+                    <a href="https://www.imdb.com/title/${this.id}/" target="_blank">Details on IMDb</a>
+                </button>
+                <div class="d-flex flex-row justify-content-center mt-3">
+                    <span class="rating">Rating: </span>
+                    <button title="Change Rating" class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id} data-action="rate" data-type=${this.type}>Change Rating</button>
+                </div>
+            </div>
+            `;
+        }
+        
         this.parent.append(movieCardElement); // adding to DOM
     }
 }

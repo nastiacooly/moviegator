@@ -35,7 +35,7 @@ class MovieDB(models.Model):
 
 class UserActions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
-    movie = models.OneToOneField(MovieDB, on_delete=models.CASCADE, blank=False, related_name="movie_details")
+    movie = models.OneToOneField(MovieDB, on_delete=models.CASCADE, blank=False, related_name="movie_actions")
     watchlist = models.BooleanField(default=False)
     watched = models.BooleanField(default=False)
     RATINGS = (

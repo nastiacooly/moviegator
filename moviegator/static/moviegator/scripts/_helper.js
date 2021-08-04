@@ -21,6 +21,13 @@ export function showWithAnimation(element, animationName) {
     element.style.animation = `${animationName} 2s linear 0s 1 normal forwards`;
 }
 
+export function removeWithAnimation(element, animationName) {
+    element.style.animation = `${animationName} 1s linear 0s 1 normal forwards`;
+    element.addEventListener('animationend', () => {
+        element.remove();
+    });
+}
+
 // Renders error alert messages
 export function renderMessageAlert(message, type) {
     const messageView = document.querySelector('#message');

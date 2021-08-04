@@ -248,3 +248,30 @@ def get_watchlist(request):
         except UserActions.DoesNotExist:
             return JsonResponse({'message': 'Watchlist is empty'})
 
+
+@login_required
+def remove_from_watchlist(request):
+    # Ensure POST-request is made by Javascript (fetch)
+    if request.method == "POST" and request.is_ajax():
+        # Getting JSON data
+        data = json.loads(request.body)
+        imdb_id = data['imdb_id']
+        # Get movie from MovieDB
+        try:
+            movie = MovieDB.objects.get(imdb_id=imdb_id)
+        except MovieDB.DoesNotExist:
+            return JsonResponse({'error': 'This title was not found'})
+
+        # Removing from watchlist
+        movie_actions = movie.movie_actions
+        try:
+            movie_actions.watchlist = False
+            movie_actions.save(update_fields=['watchlist'])
+            return JsonResponse({'message': 'Removed from your watchlist'})
+        except IntegrityError:
+            return JsonResponse({'error': 'Sorry, something went wrong'})
+    
+    # In case request was GET or not AJAX
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
