@@ -149,6 +149,7 @@ def ratings_view(request):
 def get_data(request, parameter):
     # Ensure request is made by Javascript (fetch)
     if request.is_ajax():
+        # API calls depending on user's choice
         if parameter == "top-movies":
             r = requests.get(API_URL+top250_movies+API_KEY)
 
@@ -158,12 +159,31 @@ def get_data(request, parameter):
         if parameter == "trend":
             r = requests.get(API_URL+in_theatres+API_KEY)
 
+        # Request to API was successful
         if r.status_code == 200:
             result = r.json()
             random_choice = random.choice(result["items"])
+            processed = set()
+
+            # Ensure that user hasn't already interacted with this movie/show
+            watchlist = UserActions.objects.filter(user=request.user, watchlist=True).values_list('movie__imdb_id', flat=True)
+            watched_list = UserActions.objects.filter(user=request.user, watched=True).values_list('movie__imdb_id', flat=True)
+            # While random movie/show is known to user...
+            while random_choice["id"] in watchlist or random_choice["id"] in watched_list:
+                # ...remember that this random item was processed...
+                processed.add(random_choice["id"])
+                # ...if all items was already processed, return error and end loop...
+                if len(result["items"]) == len(processed):
+                    return JsonResponse({"error": "Sorry, we have no more recommendations in this category which you haven't already seen. Please start over."})
+                # ...else, try another random
+                random_choice = random.choice(result["items"])
+            
             return JsonResponse(random_choice)
+        
+        # Request to API failed
         else:
-            return JsonResponse({"message": "Sorry, something went wrong. Please, try again."})
+            return JsonResponse({"error": "Sorry, something went wrong. Please, try again."})
+    # Show error, if page was not requested by AJAX
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
@@ -171,18 +191,38 @@ def get_data(request, parameter):
 def get_data_by_genre(request, type, genre):
     # Ensure request is made by Javascript (fetch)
     if request.is_ajax():
+        # API calls depending on user's choice
         if type == "movie":
             r = requests.get(API_URL+list_by_genre+API_KEY+'/'+movies_lists_ids[genre])
 
         if type == "show":
             r = requests.get(API_URL+list_by_genre+API_KEY+'/'+shows_lists_ids[genre])
 
+        # Request to API was successful
         if r.status_code == 200:
             result = r.json()
             random_choice = random.choice(result["items"])
+            processed = set()
+
+            # Ensure that user hasn't already interacted with this movie/show
+            watchlist = UserActions.objects.filter(user=request.user, watchlist=True).values_list('movie__imdb_id', flat=True)
+            watched_list = UserActions.objects.filter(user=request.user, watched=True).values_list('movie__imdb_id', flat=True)
+            # While random movie/show is known to user...
+            while random_choice["id"] in watchlist or random_choice["id"] in watched_list:
+                # ...remember that this item was processed
+                processed.add(random_choice["id"])
+                # ...if all items was already processed, return error and end loop...
+                if len(result["items"]) == len(processed):
+                    return JsonResponse({"error": "Sorry, we have no more recommendations in this category which you haven't already seen. Please start over."})
+                # ...else, try another random
+                random_choice = random.choice(result["items"])
+            
             return JsonResponse(random_choice)
+
+        # Request to API failed
         else:
-            return JsonResponse({"message": "Sorry, something went wrong. Please, try again."})
+            return JsonResponse({"error": "Sorry, something went wrong. Please, try again."})
+    # Show error, if page was not requested by AJAX
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
@@ -213,9 +253,8 @@ def add_to_watchlist(request):
 
             movie.save()
 
-        except IntegrityError as e:
+        except IntegrityError:
             movie = MovieDB.objects.get(imdb_id=data['imdb_id'])
-            return JsonResponse({'error': 'Already in your watchlist'})
 
         # Adding to watchlist
         obj, created = UserActions.objects.update_or_create(

@@ -100,5 +100,6 @@ export function append_script(src) {
     let script = document.createElement('script');
     script.src = src;
     script.type = 'module';
+    script.id = 'user_actions';
     document.body.append(script);
 }

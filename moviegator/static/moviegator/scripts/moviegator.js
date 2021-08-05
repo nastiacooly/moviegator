@@ -102,9 +102,12 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Getting random movie from requested category
                     helper.getResource(`/get_data/${randomTypeChoice}`)
                     .then(data => {
-                        if (data.message) {
+                        if (data.error) {
                             // Displaying error message
-                            helper.renderMessageAlert(data.message, "danger");
+                            helper.renderMessageAlert(data.error, "danger");
+                            // TO DO HERE AND IN EVERY RESULT RENDERING BELOW:
+                            // - render error in result container if no more recommendations available
+                            // - remove spinner in this case
                         }
                         else {
                             // Removing any previous error messages
@@ -177,9 +180,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Getting random movie/show for chosen mood (genre)
                     helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
                     .then(data => {
-                        if (data.message) {
+                        if (data.error) {
                             // Displaying error message
-                            helper.renderMessageAlert(data.message, "danger");
+                            helper.renderMessageAlert(data.error, "danger");
                         }
                         else {
                             // Removing any previous error messages
@@ -216,9 +219,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Getting random movie/show for chosen genre
                     helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
                     .then(data => {
-                        if (data.message) {
+                        if (data.error) {
                             // Displaying error message
-                            helper.renderMessageAlert(data.message, "danger");
+                            helper.renderMessageAlert(data.error, "danger");
                         }
                         else {
                             // Removing any previous error messages
@@ -255,9 +258,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // If user chose "random buttons" in start section
                     helper.getResource(`/get_data/${randomTypeChoice}`)
                     .then(data => {
-                        if (data.message) {
+                        if (data.error) {
                             // Displaying error message
-                            helper.renderMessageAlert(data.message, "danger");
+                            helper.renderMessageAlert(data.error, "danger");
                         }
                         else {
                             // Removing any previous error messages
@@ -267,12 +270,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             result.render();
                             // Setting status for result section
                             sectionResult.dataset.status = "loaded";
+                            // Removing script for user actions...
+                            const script = document.querySelector('script#user_actions');
+                            script.remove();
                         }
                     })
                     .then(() => {
-                        // Setting status for result section
                         if (sectionResult.dataset.status === "loaded") {
-                            // Adding script for user actions
+                            // ..and adding it once more (for the script to load newly rendered movie card)
                             helper.append_script(userActionsScriptSrc);
                         }
                     });
@@ -282,9 +287,9 @@ document.addEventListener('DOMContentLoaded', () => {
                     // If user chose mood/genre
                     helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
                     .then(data => {
-                        if (data.message) {
+                        if (data.error) {
                             // Displaying error message
-                            helper.renderMessageAlert(data.message, "danger");
+                            helper.renderMessageAlert(data.error, "danger");
                         }
                         else {
                             // Removing any previous error messages
@@ -294,14 +299,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             // Creating movie card and rendering it
                             let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
                             result.render();
+                            // Setting status for result section
+                            sectionResult.dataset.status = "loaded";
+                            // Removing script for user actions...
+                            const script = document.querySelector('script#user_actions');
+                            script.remove();
                         }
                     })
                     .then(() => {
-                        // Setting status for result section
-                        sectionResult.dataset.status = "loaded";
-                        // Adding script for user actions
-                        helper.append_script(userActionsScriptSrc);
-
+                        if (sectionResult.dataset.status === "loaded") {
+                            // ..and adding it once more (for the script to load newly rendered movie card)
+                            helper.append_script(userActionsScriptSrc);
+                        }
                     });
                 }
             });
@@ -363,7 +372,27 @@ document.addEventListener('DOMContentLoaded', () => {
             helper.hide(sectionRated);
         });
     }
-    
+
+
+    // Mutations observer TO APPLY LATER FOR DYNAMIC CONTENT IN RESULT SECTION
+    // Options for the observer (which mutations to observe)
+    const config = { attributes: true, childList: true, subtree: true };
+    // Callback function to execute when mutations are observed
+    function callback(mutationsList, observer) {
+        // Use traditional 'for loops' for IE 11
+        for(const mutation of mutationsList) {
+            if (mutation.type === 'childList') {
+                console.log('A child node has been added or removed.');
+            }
+            else if (mutation.type === 'attributes') {
+                console.log('The ' + mutation.attributeName + ' attribute was modified.');
+            }
+        }
+    }
+    // Create an observer instance linked to the callback function
+    const observer = new MutationObserver(callback);
+    // Start observing the target node for configured mutations
+    observer.observe(resultContainer, config);
 
 });
 
