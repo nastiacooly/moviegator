@@ -174,7 +174,7 @@ def get_data(request, parameter):
                 processed.add(random_choice["id"])
                 # ...if all items was already processed, return error and end loop...
                 if len(result["items"]) == len(processed):
-                    return JsonResponse({"error": "Sorry, we have no more recommendations in this category which you haven't already seen. Please start over."})
+                    return JsonResponse({"empty": "Sorry, we have no more recommendations in this category which you haven't already added to your watchlist or marked as watched. Please start over."})
                 # ...else, try another random
                 random_choice = random.choice(result["items"])
             
@@ -213,7 +213,7 @@ def get_data_by_genre(request, type, genre):
                 processed.add(random_choice["id"])
                 # ...if all items was already processed, return error and end loop...
                 if len(result["items"]) == len(processed):
-                    return JsonResponse({"error": "Sorry, we have no more recommendations in this category which you haven't already seen. Please start over."})
+                    return JsonResponse({"empty": "Sorry, we have no more recommendations in this category which you haven't already added to your watchlist or marked as watched. Please start over."})
                 # ...else, try another random
                 random_choice = random.choice(result["items"])
             

@@ -47,6 +47,17 @@ export function removeMessageAlert() {
 }
 
 
+// Render info paragraph (if none) inside parent 
+export function renderInfoHeader(text, parent) {
+    if (!parent.querySelector('p.info')) {
+        const info = document.createElement('p');
+        info.classList.add('info', 'mt-5');
+        info.textContent = text;
+        parent.append(info);
+    }
+}
+
+
 // Rendering spinner animated img on loadng data inside a specified parent element
 export function renderSpinner(parent) {
     const spinner = document.createElement('img');

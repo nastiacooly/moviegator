@@ -6,7 +6,33 @@ import * as helper from "./_helper.js";
 let movieOrShowChoice = '';
 let genreChoice = '';
 let randomTypeChoice = '';
+let spinner;
 const userActionsScriptSrc = "/static/moviegator/scripts/user_actions.js";
+
+
+// Function for handling and rendering response data
+// Parameters: data - for JS-object with data, resultContainer - parent-element for rendering result,
+// sectionResult - HTML-page section containing resultContainer
+const renderResult = (data, resultContainer, sectionResult) => {
+    if (data.error) {
+        // Displaying error message
+        helper.renderMessageAlert(data.error, "danger");
+    } else if (data.empty) {
+        // If no recommendations, remove spinner and display information to user
+        spinner.remove();
+        helper.renderInfoHeader(data.empty, resultContainer);
+    } else {
+        // Removing any previous error messages
+        helper.removeMessageAlert();
+        // Removing spinner
+        spinner.remove();
+        // Creating movie card and rendering it
+        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
+        result.render();
+        // Setting status for result section
+        sectionResult.dataset.status = "loaded";
+    }
+};
 
 
 // Dynamic page scripts
@@ -98,31 +124,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Showing result section
                     helper.show(sectionResult);
                     // Showing spinner while JSON loads
-                    const spinner = helper.renderSpinner(resultContainer);
+                    spinner = helper.renderSpinner(resultContainer);
                     // Getting random movie from requested category
                     helper.getResource(`/get_data/${randomTypeChoice}`)
                     .then(data => {
-                        if (data.error) {
-                            // Displaying error message
-                            helper.renderMessageAlert(data.error, "danger");
-                            // TO DO HERE AND IN EVERY RESULT RENDERING BELOW:
-                            // - render error in result container if no more recommendations available
-                            // - remove spinner in this case
-                        }
-                        else {
-                            // Removing any previous error messages
-                            helper.removeMessageAlert();
-                            // Removing spinner
-                            spinner.remove();
-                            // Creating movie card and rendering it
-                            let result = new MovieCard(data.image, 'poster', data.title, data.year, data.stars, data.id, movieOrShowChoice, resultContainer);
-                            // Rendering movie card
-                            result.render();
-                        }
+                        renderResult(data, resultContainer, sectionResult);
                     })
                     .then(() => {
-                        // Setting status for result section
-                        sectionResult.dataset.status = "loaded";
                         // Adding script for user actions
                         helper.append_script(userActionsScriptSrc);
                     });
@@ -176,27 +184,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Showing section with recommendation
                     helper.showWithAnimation(sectionResult, 'appear');
                     // Showing spinner while JSON loads
-                    const spinner = helper.renderSpinner(resultContainer);
+                    spinner = helper.renderSpinner(resultContainer);
                     // Getting random movie/show for chosen mood (genre)
                     helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
                     .then(data => {
-                        if (data.error) {
-                            // Displaying error message
-                            helper.renderMessageAlert(data.error, "danger");
-                        }
-                        else {
-                            // Removing any previous error messages
-                            helper.removeMessageAlert();
-                            // Removing spinner
-                            spinner.remove();
-                            // Creating movie card and rendering it
-                            let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
-                            result.render();                            
-                        }
+                        renderResult(data, resultContainer, sectionResult);
                     })
                     .then(() => {
-                        // Setting status for result section
-                        sectionResult.dataset.status = "loaded";
                         // Adding script for user actions
                         helper.append_script(userActionsScriptSrc);
                     });
@@ -215,27 +209,13 @@ document.addEventListener('DOMContentLoaded', () => {
                     // Showing section with recommendation
                     helper.showWithAnimation(sectionResult, 'appear');
                     // Showing spinner while JSON loads
-                    const spinner = helper.renderSpinner(resultContainer);
+                    spinner = helper.renderSpinner(resultContainer);
                     // Getting random movie/show for chosen genre
                     helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
                     .then(data => {
-                        if (data.error) {
-                            // Displaying error message
-                            helper.renderMessageAlert(data.error, "danger");
-                        }
-                        else {
-                            // Removing any previous error messages
-                            helper.removeMessageAlert();
-                            // Removing spinner
-                            spinner.remove();
-                            // Creating movie card and rendering it
-                            let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
-                            result.render();
-                        }
+                        renderResult(data, resultContainer, sectionResult);
                     })
                     .then(() => {
-                        // Setting status for result section
-                        sectionResult.dataset.status = "loaded";
                         // Adding script for user actions
                         helper.append_script(userActionsScriptSrc);
                     });
@@ -243,7 +223,6 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
     }
-    
 
     // More results for user's preferences
     if (sectionResult) {
@@ -258,57 +237,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     // If user chose "random buttons" in start section
                     helper.getResource(`/get_data/${randomTypeChoice}`)
                     .then(data => {
-                        if (data.error) {
-                            // Displaying error message
-                            helper.renderMessageAlert(data.error, "danger");
-                        }
-                        else {
-                            // Removing any previous error messages
-                            helper.removeMessageAlert();
-                            // Creating movie card and rendering it
-                            let result = new MovieCard(data.image, 'poster', data.title, data.year, data.crew, data.id, movieOrShowChoice, resultContainer);
-                            result.render();
-                            // Setting status for result section
-                            sectionResult.dataset.status = "loaded";
-                            // Removing script for user actions...
-                            const script = document.querySelector('script#user_actions');
-                            script.remove();
-                        }
+                        renderResult(data, resultContainer, sectionResult);
                     })
                     .then(() => {
                         if (sectionResult.dataset.status === "loaded") {
-                            // ..and adding it once more (for the script to load newly rendered movie card)
+                            // Adding script for user's actions
                             helper.append_script(userActionsScriptSrc);
                         }
                     });
                 } else {
                     // Showing spinner while JSON loads
-                    const spinner = helper.renderSpinner(resultContainer);
+                    spinner = helper.renderSpinner(resultContainer);
                     // If user chose mood/genre
                     helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
                     .then(data => {
-                        if (data.error) {
-                            // Displaying error message
-                            helper.renderMessageAlert(data.error, "danger");
-                        }
-                        else {
-                            // Removing any previous error messages
-                            helper.removeMessageAlert();
-                            // Removing spinner
-                            spinner.remove();
-                            // Creating movie card and rendering it
-                            let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
-                            result.render();
-                            // Setting status for result section
-                            sectionResult.dataset.status = "loaded";
-                            // Removing script for user actions...
-                            const script = document.querySelector('script#user_actions');
-                            script.remove();
-                        }
+                        renderResult(data, resultContainer, sectionResult);
                     })
                     .then(() => {
                         if (sectionResult.dataset.status === "loaded") {
-                            // ..and adding it once more (for the script to load newly rendered movie card)
+                            // Adding script for user's actions
                             helper.append_script(userActionsScriptSrc);
                         }
                     });
