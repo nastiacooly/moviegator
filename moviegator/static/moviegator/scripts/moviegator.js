@@ -7,7 +7,25 @@ let movieOrShowChoice = '';
 let genreChoice = '';
 let randomTypeChoice = '';
 let spinner;
-const userActionsScriptSrc = "/static/moviegator/scripts/user_actions.js";
+
+
+// Getting CSRF-token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            // Does this cookie string begin with the name we want?
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+const csrftoken = getCookie('csrftoken');
 
 
 // Function for handling and rendering response data
@@ -35,6 +53,30 @@ const renderResult = (data, resultContainer, sectionResult) => {
 };
 
 
+// Function for getting data from movie card
+function get_movie_details_on_click(button) {
+    // Saving movie/show details from DOM-elements...
+    const image = document.querySelector('.card-img-top'),
+    title = document.querySelector('.card-title'),
+    year = document.querySelector('.card-subtitle'),
+    details = document.querySelector('.card-text'),
+    imdb_id = button.dataset.id,
+    type = button.dataset.type[0];
+    // Adding them to object...
+    const movie_details = {
+    imdb_id: imdb_id,
+    type: type,
+    title: title.innerHTML,
+    year: year.innerHTML,
+    image: image.src,
+    details: details.innerHTML
+    };
+    // ... and returning JSON-data
+    return JSON.stringify(movie_details);
+}
+
+
+
 // Dynamic page scripts
 document.addEventListener('DOMContentLoaded', () => {
     // Variables for app sections
@@ -45,6 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionGenre = document.querySelector('#section-genre'),
         sectionResult = document.querySelector('#section-result'),
         resultContainer = document.querySelector('.result-container'),
+        sectionUser = document.querySelector('#section-user'),
         sectionWatchlist = document.querySelector('#section-watchlist'),
         sectionWatched = document.querySelector('#section-watched'),
         sectionRated = document.querySelector('#section-rated'),
@@ -68,6 +111,58 @@ document.addEventListener('DOMContentLoaded', () => {
             menuArrow.innerHTML = "menu &#8595;";
         }
     });
+
+
+    // Mutations observer
+    // Options for the observer (which mutations to observe)
+    const config = { childList: true };
+    // Callback function to execute when mutations are observed
+    function add_to_watchlist(mutations, observer) {
+        mutations.forEach(mutation => {
+            mutation.addedNodes.forEach(node => {
+                // If movie card was rendered
+                if (node.classList.contains('card')) {
+                    // Get 'Add to watchlist' button
+                    const addToWatchlistBtn = sectionResult.querySelector('button[data-action="watchlist"]');
+                    if (addToWatchlistBtn) {
+                        // On click of this button
+                        addToWatchlistBtn.addEventListener('click', () => {
+                            // Get movie details
+                            const data = get_movie_details_on_click(addToWatchlistBtn);
+                            
+                            // Make POST-request to add movie/show to movie database of the app and to watchlist
+                            helper.postData('/add_to_watchlist', data, csrftoken)
+                            .then(data => {
+                                if (data.error) {
+                                    // Render error message
+                                    helper.renderMessageAlert(data.error, 'danger');
+                                    // Remove error mssg after some time
+                                    setTimeout(helper.removeMessageAlert, 5000);
+                                } else if (data.message) {
+                                    // Remove previous messages if any
+                                    helper.removeMessageAlert();
+                                    // Showing successful result message
+                                    helper.renderMessageAlert(data.message, 'success');
+                                    // Remove success mssg after some time
+                                    setTimeout(helper.removeMessageAlert, 3000);
+                                }
+                            });
+                        });
+                    }
+                }
+            });
+        });
+    }
+
+    // Create observer instance linked to the callback function
+    const observer = new MutationObserver(add_to_watchlist);
+    // Mutations observer start and disconnect in corresponding sections
+    if (sectionWelcome) {
+        observer.observe(resultContainer, config);
+    }
+    if (sectionUser) {
+        observer.disconnect();
+    }
 
 
     // Click 'Start' btn to enter start section
@@ -129,10 +224,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     helper.getResource(`/get_data/${randomTypeChoice}`)
                     .then(data => {
                         renderResult(data, resultContainer, sectionResult);
-                    })
-                    .then(() => {
-                        // Adding script for user actions
-                        helper.append_script(userActionsScriptSrc);
                     });
                 });
 
@@ -189,10 +280,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
                     .then(data => {
                         renderResult(data, resultContainer, sectionResult);
-                    })
-                    .then(() => {
-                        // Adding script for user actions
-                        helper.append_script(userActionsScriptSrc);
                     });
                 });
             });
@@ -214,10 +301,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
                     .then(data => {
                         renderResult(data, resultContainer, sectionResult);
-                    })
-                    .then(() => {
-                        // Adding script for user actions
-                        helper.append_script(userActionsScriptSrc);
                     });
                 });
             });
@@ -238,12 +321,6 @@ document.addEventListener('DOMContentLoaded', () => {
                     helper.getResource(`/get_data/${randomTypeChoice}`)
                     .then(data => {
                         renderResult(data, resultContainer, sectionResult);
-                    })
-                    .then(() => {
-                        if (sectionResult.dataset.status === "loaded") {
-                            // Adding script for user's actions
-                            helper.append_script(userActionsScriptSrc);
-                        }
                     });
                 } else {
                     // Showing spinner while JSON loads
@@ -252,18 +329,55 @@ document.addEventListener('DOMContentLoaded', () => {
                     helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
                     .then(data => {
                         renderResult(data, resultContainer, sectionResult);
-                    })
-                    .then(() => {
-                        if (sectionResult.dataset.status === "loaded") {
-                            // Adding script for user's actions
-                            helper.append_script(userActionsScriptSrc);
-                        }
                     });
                 }
             });
         }
     }
 
+    // Function to remove title from watchlist on click of a button
+    function remove_from_watchlist_on_click() {
+        // Get 'Remove from Watchlist' buttons
+        const removeFromWatchlistBtns = sectionWatchlist.querySelectorAll('button[data-action="watchlist"]');
+        if (removeFromWatchlistBtns) {
+            // On click of these buttons
+            removeFromWatchlistBtns.forEach(button => {
+                button.addEventListener('click', (e) => {
+                    // Get movie IMDb id...
+                    const imdb_id = e.target.dataset.id;
+
+                    const movie_details = {
+                        imdb_id: imdb_id
+                    };
+                    // ... and convert to JSON
+                    const data = JSON.stringify(movie_details);
+
+                    // Make POST-request to remove movie/show from user's watchlist
+                    helper.postData('/remove_from_watchlist', data, csrftoken)
+                    .then(data => {
+                        if (data.error) {
+                            // Render error message
+                            helper.renderMessageAlert(data.error, 'danger');
+                            // Remove error mssg after some time
+                            setTimeout(helper.removeMessageAlert, 5000);
+                        } else if (data.message) {
+                            // Remove previous messages if any
+                            helper.removeMessageAlert();
+                            // Showing successful result message
+                            helper.renderMessageAlert(data.message, 'success');
+                            // Remove success mssg after some time
+                            setTimeout(helper.removeMessageAlert, 3000);
+                        }
+                    })
+                    .then(() => {
+                        // Remove movie card from watchlist page (from DOM)
+                        let movieCard = e.target.parentElement.parentElement.parentElement;
+                        helper.removeWithAnimation(movieCard, 'disappear');
+                    });
+                });
+            });
+        }
+    }
 
     // See watchlist
     const watchlistBtn = document.querySelector('button[data-profile="watchlist"]');
@@ -296,10 +410,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         });
                     }
                 })
-                .then(() => {
-                    // Adding script for user actions
-                    helper.append_script(userActionsScriptSrc);
-                });
+                .then(remove_from_watchlist_on_click);
             }
             // Show watchlist and hide other section
             helper.show(sectionWatchlist);
@@ -309,7 +420,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // See list of watched movies
+    // See list of watched movies TODO
     const watchedBtn = document.querySelector('button[data-profile="watched"]');
     if (watchedBtn) {
         watchedBtn.addEventListener('click', () => {
@@ -319,27 +430,6 @@ document.addEventListener('DOMContentLoaded', () => {
             helper.hide(sectionRated);
         });
     }
-
-
-    // Mutations observer TO APPLY LATER FOR DYNAMIC CONTENT IN RESULT SECTION
-    // Options for the observer (which mutations to observe)
-    const config = { attributes: true, childList: true, subtree: true };
-    // Callback function to execute when mutations are observed
-    function callback(mutationsList, observer) {
-        // Use traditional 'for loops' for IE 11
-        for(const mutation of mutationsList) {
-            if (mutation.type === 'childList') {
-                console.log('A child node has been added or removed.');
-            }
-            else if (mutation.type === 'attributes') {
-                console.log('The ' + mutation.attributeName + ' attribute was modified.');
-            }
-        }
-    }
-    // Create an observer instance linked to the callback function
-    const observer = new MutationObserver(callback);
-    // Start observing the target node for configured mutations
-    observer.observe(resultContainer, config);
 
 });
 
