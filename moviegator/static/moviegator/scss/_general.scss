@@ -6,6 +6,12 @@ body {
     overflow-x: hidden;
 }
 
+.spinner {
+    display: block;
+    padding-top: 10px;
+    margin: 0 auto;
+}
+
 .navbar {
     z-index: 7;
     top: -10vh;
@@ -67,6 +73,7 @@ a, a:hover {
 #message {
     position: relative;
     z-index: 10;
+    font-size: 1.2rem;
 }
 
 section {
@@ -140,4 +147,19 @@ div {
 
 .watchlist-container {
     max-width: 100%;
+}
+
+.animated {
+    &-slideDown {
+        animation: slideDown 1s linear 0s 1 normal forwards;
+    }
+    &-slideUp {
+        animation: slideUp 1s linear 0s 1 normal forwards;
+    }
+    &-enterScreen {
+        animation: enterScreen 1s linear 0s 1 normal forwards;
+    }
+    &-exitScreen {
+        animation: exitScreen 1s linear 0s 1 normal forwards;
+    }
 }

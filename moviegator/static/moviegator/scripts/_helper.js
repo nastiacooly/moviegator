@@ -1,4 +1,34 @@
-// Helper functions
+/*
+This is the configuration for the helper functions script.
+Do not change anything here unless something has changed 
+in HTML-structure or CSS.
+*/
+
+const configuration = {
+    CSS: {
+        IDs: {
+            messageView: 'message'
+        },
+        classes: {
+            info: 'info',
+            marginTop5: 'mt-5',
+            spinner: 'spinner'
+        }
+    },
+    staticFilesSrc: {
+        spinnerSVG: '/static/moviegator/img/spinner.svg'
+    }
+};
+
+
+/*
+End of configuration
+*/
+
+
+/*
+Helper functions
+*/
 
 // Functions for hiding/showing elements
 export function hide(element) {
@@ -28,30 +58,27 @@ export function removeWithAnimation(element, animationName) {
     });
 }
 
-// Renders error alert messages
+// Renders alert messages
 export function renderMessageAlert(message, type) {
-    const messageView = document.querySelector('#message');
+    const messageView = document.querySelector(`#${configuration.CSS.IDs.messageView}`);
+    messageView.className = `alert alert-${type}`;
+    messageView.role = "alert";
+    messageView.innerHTML = message;
     messageView.style.display = 'block';
-    const errorElement = document.createElement('div');
-
-    errorElement.classList.add("alert", `alert-${type}`);
-    errorElement.role = "alert";
-    errorElement.innerHTML = message;
-    messageView.appendChild(errorElement);
 }
 
-// Removes error alerts
+// Removes alerts
 export function removeMessageAlert() {
-    const messageView = document.querySelector('#message');
+    const messageView = document.querySelector(`#${configuration.CSS.IDs.messageView}`);
     messageView.style.display = 'none';
 }
 
 
 // Render info paragraph (if none) inside parent 
 export function renderInfoHeader(text, parent) {
-    if (!parent.querySelector('p.info')) {
+    if (!parent.querySelector(`p.${configuration.CSS.classes.info}`)) {
         const info = document.createElement('p');
-        info.classList.add('info', 'mt-5');
+        info.classList.add(configuration.CSS.classes.info, configuration.CSS.classes.marginTop5);
         info.textContent = text;
         parent.append(info);
     }
@@ -61,18 +88,14 @@ export function renderInfoHeader(text, parent) {
 // Rendering spinner animated img on loadng data inside a specified parent element
 export function renderSpinner(parent) {
     const spinner = document.createElement('img');
-    spinner.src = '/static/moviegator/img/spinner.svg';
-    spinner.style.cssText = `
-        display: block;
-        padding-top: 10px;
-        margin: 0 auto;
-    `;
+    spinner.src = configuration.staticFilesSrc.spinnerSVG;
+    spinner.classList.add(configuration.CSS.classes.spinner);
     parent.appendChild(spinner);
     return spinner;
 }
 
 
-// Function to make GET-requests
+// Function to make GET-requests which return JSON-data
 export const getResource = async (url) => {
     const result = await fetch(url, {
         headers: {
@@ -89,7 +112,7 @@ export const getResource = async (url) => {
 };
 
 
-// Function to make POST-requests
+// Function to make POST-requests which return JSON-data
 export const postData = async (url, data, csrftoken) => {
     const result = await fetch(url, {
         method: 'POST',
@@ -104,13 +127,3 @@ export const postData = async (url, data, csrftoken) => {
 
     return await result.json();
 };
-
-
-// Function to add script to a page
-export function append_script(src) {
-    let script = document.createElement('script');
-    script.src = src;
-    script.type = 'module';
-    script.id = 'user_actions';
-    document.body.append(script);
-}

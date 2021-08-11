@@ -1,15 +1,80 @@
-// importing my helper functions
+/* importing my helper functions */
 import * as helper from "./_helper.js";
 
 
-// Variables to access globally
-let movieOrShowChoice = '';
-let genreChoice = '';
-let randomTypeChoice = '';
+// Global variables
 let spinner;
+let userChoices = {
+    movieOrShow: '',
+    genre: '',
+    randomType: '',
+};
 
 
-// Getting CSRF-token
+/*
+This is the configuration for the application.
+Do not change anything here unless something has changed 
+in HTML-structure, CSS or Django (backend).
+*/
+
+const config = {
+    CSS: {
+        sectionIDs: {
+            welcome: 'section-welcome',
+            start: 'section-start',
+            moodOrGenre: 'section-mood-genre',
+            mood: 'section-mood',
+            genre: 'section-genre',
+            result: 'section-result',
+            profile: 'section-user',
+            watchlist: 'section-watchlist',
+            watched: 'section-watched',
+            rated: 'section-rated'
+        },
+        containerClasses: {
+            watchlist: 'watchlist-container',
+            result: 'result-container'
+        },
+        animationNames: {
+            slideToTop: 'slideToTop',
+            disappear: 'disappear',
+            appear: 'appear',
+            scale: 'scale',
+            enterScreen: 'enterScreen',
+            exitScreen: 'exitScreen',
+            slideDown: 'slideDown',
+            slideUp: 'slideUp'
+        },
+        bootstrapAlertTypes: {
+            danger: 'danger',
+            success: 'success'
+        },
+        bootstrapCardClasses: {
+            card: 'card',
+            cardImg: 'card-img-top',
+            cardTitle: 'card-title',
+            cardSubtitle: 'card-subtitle',
+            cardText: 'card-text'
+        }
+    },
+    backend: {
+        csrftoken: getCookie('csrftoken')
+    },
+    urlPaths: {
+        watchlist: '/get_watchlist',
+        addToWatchlist: '/add_to_watchlist',
+        removeFromWatchlist: '/remove_from_watchlist',
+        getMovieData: '/get_data',
+        movieByGenre: `/get_data/${userChoices.movieOrShow}/${userChoices.genre}`
+    }
+};
+
+/*
+End of configuration
+*/
+
+
+// Function for Getting CSRF-token
 function getCookie(name) {
     let cookieValue = null;
     if (document.cookie && document.cookie !== '') {
@@ -25,16 +90,17 @@ function getCookie(name) {
     }
     return cookieValue;
 }
-const csrftoken = getCookie('csrftoken');
 
 
-// Function for handling and rendering response data
-// Parameters: data - for JS-object with data, resultContainer - parent-element for rendering result,
-// sectionResult - HTML-page section containing resultContainer
-const renderResult = (data, resultContainer, sectionResult) => {
+/* Function for handling and rendering response data
+Parameters: data - for JS-object with data, 
+detailsParameter - for data.key which contains details about a movie, 
+resultContainer - parent-element for rendering result,
+*/
+const renderResult = (data, detailsParameter, resultContainer) => {
     if (data.error) {
         // Displaying error message
-        helper.renderMessageAlert(data.error, "danger");
+        helper.renderMessageAlert(data.error, config.CSS.bootstrapAlertTypes.danger);
     } else if (data.empty) {
         // If no recommendations, remove spinner and display information to user
         spinner.remove();
@@ -45,21 +111,19 @@ const renderResult = (data, resultContainer, sectionResult) => {
         // Removing spinner
         spinner.remove();
         // Creating movie card and rendering it
-        let result = new MovieCard(data.image, 'poster', data.title, data.year, data.description, data.id, movieOrShowChoice, resultContainer);
+        let result = new MovieCard(data.image, 'poster', data.title, data.year, detailsParameter, data.id, userChoices.movieOrShow, resultContainer);
         result.render();
-        // Setting status for result section
-        sectionResult.dataset.status = "loaded";
     }
 };
 
 
 // Function for getting data from movie card
-function get_movie_details_on_click(button) {
+function returnMovieDetails(button) {
     // Saving movie/show details from DOM-elements...
-    const image = document.querySelector('.card-img-top'),
-    title = document.querySelector('.card-title'),
-    year = document.querySelector('.card-subtitle'),
-    details = document.querySelector('.card-text'),
+    const image = document.querySelector(`.${config.CSS.bootstrapCardClasses.cardImg}`),
+    title = document.querySelector(`.${config.CSS.bootstrapCardClasses.cardTitle}`),
+    year = document.querySelector(`.${config.CSS.bootstrapCardClasses.cardSubtitle}`),
+    details = document.querySelector(`.${config.CSS.bootstrapCardClasses.cardText}`),
     imdb_id = button.dataset.id,
     type = button.dataset.type[0];
     // Adding them to object...
@@ -76,22 +140,35 @@ function get_movie_details_on_click(button) {
 }
 
 
+// Function for getting movie IMDb id from movie card
+function returnMovieID(button) {
+    // Get movie IMDb id from DOM...
+    const imdb_id = button.dataset.id;
+
+    const movie_details = {
+        imdb_id: imdb_id
+    };
+    // ... and return as JSON
+    return JSON.stringify(movie_details);
+}
+
+
 
 // Dynamic page scripts
 document.addEventListener('DOMContentLoaded', () => {
     // Variables for app sections
-    const sectionWelcome = document.querySelector('#section-welcome'),
-        sectionStart = document.querySelector('#section-start'),
-        sectionMoodGenre = document.querySelector('#section-mood-genre'),
-        sectionMood = document.querySelector('#section-mood'),
-        sectionGenre = document.querySelector('#section-genre'),
-        sectionResult = document.querySelector('#section-result'),
-        resultContainer = document.querySelector('.result-container'),
-        sectionUser = document.querySelector('#section-user'),
-        sectionWatchlist = document.querySelector('#section-watchlist'),
-        sectionWatched = document.querySelector('#section-watched'),
-        sectionRated = document.querySelector('#section-rated'),
-        watchlistContainer = document.querySelector('.watchlist-container');
+    const sectionWelcome = document.querySelector(`#${config.CSS.sectionIDs.welcome}`),
+        sectionStart = document.querySelector(`#${config.CSS.sectionIDs.start}`),
+        sectionMoodGenre = document.querySelector(`#${config.CSS.sectionIDs.moodOrGenre}`),
+        sectionMood = document.querySelector(`#${config.CSS.sectionIDs.mood}`),
+        sectionGenre = document.querySelector(`#${config.CSS.sectionIDs.genre}`),
+        sectionResult = document.querySelector(`#${config.CSS.sectionIDs.result}`),
+        resultContainer = document.querySelector(`.${config.CSS.containerClasses.result}`),
+        sectionUser = document.querySelector(`#${config.CSS.sectionIDs.profile}`),
+        sectionWatchlist = document.querySelector(`#${config.CSS.sectionIDs.watchlist}`),
+        sectionWatched = document.querySelector(`#${config.CSS.sectionIDs.watched}`),
+        sectionRated = document.querySelector(`#${config.CSS.sectionIDs.rated}`),
+        watchlistContainer = document.querySelector(`.${config.CSS.containerClasses.watchlist}`);
 
 
     // Navbar hide/show
@@ -99,14 +176,18 @@ document.addEventListener('DOMContentLoaded', () => {
     const menuArrow = document.querySelector('.menu-arrow');
     menuArrow.addEventListener('click', (e) => {
         if (e.target.dataset.slide == 'down') {
-            menuArrow.style.animation = `slideDown 1s linear 0s 1 normal forwards`;
-            navbar.style.animation = `enterScreen 1s linear 0s 1 normal forwards`;
+            menuArrow.classList.remove(`animated-${config.CSS.animationNames.slideUp}`);
+            menuArrow.classList.add(`animated-${config.CSS.animationNames.slideDown}`);
+            navbar.classList.add(`animated-${config.CSS.animationNames.enterScreen}`);
+            navbar.classList.remove(`animated-${config.CSS.animationNames.exitScreen}`);
             e.target.dataset.slide = 'up';
             menuArrow.innerHTML = "menu &#8593;";
         }
         else if (e.target.dataset.slide == 'up') {
-            menuArrow.style.animation = `slideUp 1s linear 0s 1 normal forwards`;
-            navbar.style.animation = `exitScreen 1s linear 0s 1 normal forwards`;
+            menuArrow.classList.remove(`animated-${config.CSS.animationNames.slideDown}`);
+            menuArrow.classList.add(`animated-${config.CSS.animationNames.slideUp}`);
+            navbar.classList.remove(`animated-${config.CSS.animationNames.enterScreen}`);
+            navbar.classList.add(`animated-${config.CSS.animationNames.exitScreen}`);
             e.target.dataset.slide = 'down';
             menuArrow.innerHTML = "menu &#8595;";
         }
@@ -115,34 +196,34 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mutations observer
     // Options for the observer (which mutations to observe)
-    const config = { childList: true };
+    const params = { childList: true };
     // Callback function to execute when mutations are observed
-    function add_to_watchlist(mutations, observer) {
+    function addToWatchlist(mutations, observer) {
         mutations.forEach(mutation => {
             mutation.addedNodes.forEach(node => {
                 // If movie card was rendered
-                if (node.classList.contains('card')) {
+                if (node.classList.contains(config.CSS.bootstrapCardClasses.card)) {
                     // Get 'Add to watchlist' button
                     const addToWatchlistBtn = sectionResult.querySelector('button[data-action="watchlist"]');
                     if (addToWatchlistBtn) {
                         // On click of this button
                         addToWatchlistBtn.addEventListener('click', () => {
                             // Get movie details
-                            const data = get_movie_details_on_click(addToWatchlistBtn);
+                            const data = returnMovieDetails(addToWatchlistBtn);
                             
                             // Make POST-request to add movie/show to movie database of the app and to watchlist
-                            helper.postData('/add_to_watchlist', data, csrftoken)
+                            helper.postData(config.urlPaths.addToWatchlist, data, config.backend.csrftoken)
                             .then(data => {
                                 if (data.error) {
                                     // Render error message
-                                    helper.renderMessageAlert(data.error, 'danger');
+                                    helper.renderMessageAlert(data.error, config.CSS.bootstrapAlertTypes.danger);
                                     // Remove error mssg after some time
                                     setTimeout(helper.removeMessageAlert, 5000);
                                 } else if (data.message) {
                                     // Remove previous messages if any
                                     helper.removeMessageAlert();
                                     // Showing successful result message
-                                    helper.renderMessageAlert(data.message, 'success');
+                                    helper.renderMessageAlert(data.message, config.CSS.bootstrapAlertTypes.success);
                                     // Remove success mssg after some time
                                     setTimeout(helper.removeMessageAlert, 3000);
                                 }
@@ -155,10 +236,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Create observer instance linked to the callback function
-    const observer = new MutationObserver(add_to_watchlist);
+    const observer = new MutationObserver(addToWatchlist);
     // Mutations observer start and disconnect in corresponding sections
     if (sectionWelcome) {
-        observer.observe(resultContainer, config);
+        observer.observe(resultContainer, params);
     }
     if (sectionUser) {
         observer.disconnect();
@@ -193,7 +274,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         button.removeAttribute('disabled');
                     }
                     // Storing user's choice to variable
-                    movieOrShowChoice = e.target.dataset.type;
+                    userChoices.movieOrShow = e.target.dataset.type;
                     // Hiding current section's content and showing next section's content
                     helper.hideWithAnimation(sectionStart, 'disappear');
                     helper.showWithAnimation(sectionMoodGenre, 'appear');
@@ -208,22 +289,22 @@ document.addEventListener('DOMContentLoaded', () => {
             randomButtons.forEach(button => {
                 button.addEventListener('click', (e) => {
                     // Saving user's choice
-                    randomTypeChoice = e.target.dataset.random;
-                    if (randomTypeChoice === 'top-shows') {
-                        movieOrShowChoice = 'show';
+                    userChoices.randomType = e.target.dataset.random;
+                    if (userChoices.randomType === 'top-shows') {
+                        userChoices.movieOrShow = 'show';
                     } else {
-                        movieOrShowChoice = 'movie';
+                        userChoices.movieOrShow = 'movie';
                     }
                     // Hiding previous section
-                    helper.hideWithAnimation(sectionStart, 'slideToTop');
+                    helper.hideWithAnimation(sectionStart, config.CSS.animationNames.slideToTop);
                     // Showing result section
                     helper.show(sectionResult);
                     // Showing spinner while JSON loads
                     spinner = helper.renderSpinner(resultContainer);
                     // Getting random movie from requested category
-                    helper.getResource(`/get_data/${randomTypeChoice}`)
+                    helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.randomType}`)
                     .then(data => {
-                        renderResult(data, resultContainer, sectionResult);
+                        renderResult(data, data.stars, resultContainer);
                     });
                 });
 
@@ -241,9 +322,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clicking 'mood' button shows section for mood choice
             moodBtn.addEventListener('click', () => {
                 // Hiding current section
-                helper.hideWithAnimation(sectionMoodGenre, 'disappear');
+                helper.hideWithAnimation(sectionMoodGenre, config.CSS.animationNames.disappear);
                 // Showing next section
-                helper.showWithAnimation(sectionMood, 'appear');
+                helper.showWithAnimation(sectionMood, config.CSS.animationNames.appear);
             });
         }
 
@@ -251,9 +332,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Clicking 'genre' button shows section for genre choice
             genreBtn.addEventListener('click', () => {
                 // Hiding current section
-                helper.hideWithAnimation(sectionMoodGenre, 'disappear');
+                helper.hideWithAnimation(sectionMoodGenre, config.CSS.animationNames.disappear);
                 // Showing next section
-                helper.showWithAnimation(sectionGenre, 'appear');
+                helper.showWithAnimation(sectionGenre, config.CSS.animationNames.appear);
             });
         }
     }
@@ -269,17 +350,17 @@ document.addEventListener('DOMContentLoaded', () => {
             moodButtons.forEach(button => {
                 button.addEventListener('click', (e) => {
                     // Saving genre according to mood choice
-                    genreChoice = e.target.dataset.genre;
+                    userChoices.genre = e.target.dataset.genre;
                     // Hiding current section
-                    helper.hideWithAnimation(sectionMood, 'disappear');
+                    helper.hideWithAnimation(sectionMood, config.CSS.animationNames.disappear);
                     // Showing section with recommendation
-                    helper.showWithAnimation(sectionResult, 'appear');
+                    helper.showWithAnimation(sectionResult, config.CSS.animationNames.appear);
                     // Showing spinner while JSON loads
                     spinner = helper.renderSpinner(resultContainer);
                     // Getting random movie/show for chosen mood (genre)
-                    helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
+                    helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.movieOrShow}/${userChoices.genre}`)
                     .then(data => {
-                        renderResult(data, resultContainer, sectionResult);
+                        renderResult(data, data.description, resultContainer);
                     });
                 });
             });
@@ -290,17 +371,17 @@ document.addEventListener('DOMContentLoaded', () => {
             genreButtons.forEach(button => {
                 button.addEventListener('click', (e) => {
                     // Saving genre according to mood choice
-                    genreChoice = e.target.dataset.genre;
+                    userChoices.genre = e.target.dataset.genre;
                     // Hiding current section
-                    helper.hideWithAnimation(sectionGenre, 'disappear');
+                    helper.hideWithAnimation(sectionGenre, config.CSS.animationNames.disappear);
                     // Showing section with recommendation
-                    helper.showWithAnimation(sectionResult, 'appear');
+                    helper.showWithAnimation(sectionResult, config.CSS.animationNames.appear);
                     // Showing spinner while JSON loads
                     spinner = helper.renderSpinner(resultContainer);
                     // Getting random movie/show for chosen genre
-                    helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
+                    helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.movieOrShow}/${userChoices.genre}`)
                     .then(data => {
-                        renderResult(data, resultContainer, sectionResult);
+                        renderResult(data, data.description, resultContainer);
                     });
                 });
             });
@@ -313,29 +394,29 @@ document.addEventListener('DOMContentLoaded', () => {
         if (moreButton) {
             moreButton.addEventListener('click', (e) => {
                 // Remove previous result element
-                const previousResult = sectionResult.querySelector('div.card');
+                const previousResult = sectionResult.querySelector(`div.${config.CSS.bootstrapCardClasses.card}`);
                 previousResult.remove();
                 // Fetching for another random movie and rendering its card
-                if (randomTypeChoice) {
+                if (userChoices.randomType) {
                     // If user chose "random buttons" in start section
-                    helper.getResource(`/get_data/${randomTypeChoice}`)
+                    helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.randomType}`)
                     .then(data => {
-                        renderResult(data, resultContainer, sectionResult);
+                        renderResult(data, data.stars, resultContainer);
                     });
                 } else {
                     // Showing spinner while JSON loads
                     spinner = helper.renderSpinner(resultContainer);
                     // If user chose mood/genre
-                    helper.getResource(`/get_data/${movieOrShowChoice}/${genreChoice}`)
+                    helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.movieOrShow}/${userChoices.genre}`)
                     .then(data => {
-                        renderResult(data, resultContainer, sectionResult);
+                        renderResult(data, data.description, resultContainer);
                     });
                 }
             });
         }
     }
 
-    // Function to remove title from watchlist on click of a button
+    // Function to remove title from watchlist on click of a button CHANGE LATER (TOO COMPLEX FUNCTION)
     function remove_from_watchlist_on_click() {
         // Get 'Remove from Watchlist' buttons
         const removeFromWatchlistBtns = sectionWatchlist.querySelectorAll('button[data-action="watchlist"]');
@@ -344,27 +425,21 @@ document.addEventListener('DOMContentLoaded', () => {
             removeFromWatchlistBtns.forEach(button => {
                 button.addEventListener('click', (e) => {
                     // Get movie IMDb id...
-                    const imdb_id = e.target.dataset.id;
-
-                    const movie_details = {
-                        imdb_id: imdb_id
-                    };
-                    // ... and convert to JSON
-                    const data = JSON.stringify(movie_details);
+                    const data = returnMovieID(e.target);
 
                     // Make POST-request to remove movie/show from user's watchlist
-                    helper.postData('/remove_from_watchlist', data, csrftoken)
+                    helper.postData(config.urlPaths.removeFromWatchlist, data, config.backend.csrftoken)
                     .then(data => {
                         if (data.error) {
                             // Render error message
-                            helper.renderMessageAlert(data.error, 'danger');
+                            helper.renderMessageAlert(data.error, config.CSS.bootstrapAlertTypes.danger);
                             // Remove error mssg after some time
                             setTimeout(helper.removeMessageAlert, 5000);
                         } else if (data.message) {
                             // Remove previous messages if any
                             helper.removeMessageAlert();
                             // Showing successful result message
-                            helper.renderMessageAlert(data.message, 'success');
+                            helper.renderMessageAlert(data.message, config.CSS.bootstrapAlertTypes.success);
                             // Remove success mssg after some time
                             setTimeout(helper.removeMessageAlert, 3000);
                         }
@@ -372,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     .then(() => {
                         // Remove movie card from watchlist page (from DOM)
                         let movieCard = e.target.parentElement.parentElement.parentElement;
-                        helper.removeWithAnimation(movieCard, 'disappear');
+                        helper.removeWithAnimation(movieCard, config.CSS.animationNames.disappear);
                     });
                 });
             });
@@ -386,12 +461,12 @@ document.addEventListener('DOMContentLoaded', () => {
         watchlistBtn.addEventListener('click', (e) => {
             // Getting watchlist from server (only if it hasn't been rendered before)
             if (watchlistContainer.childElementCount === 0) {
-                helper.getResource('get_watchlist')
+                helper.getResource(config.urlPaths.watchlist)
                 .then(data => {
                     console.log(data);
                     if (data.message) {
                         // Rendering error alert
-                        helper.renderMessageAlert(data.message, "danger");
+                        helper.renderMessageAlert(data.message, config.CSS.bootstrapAlertTypes.danger);
                     } else {
                         // Removing any previous error messages
                         helper.removeMessageAlert();
@@ -453,7 +528,7 @@ class MovieCard {
         const movieCardElement = document.createElement('div');
 
         if (this.classes.length === 0) {
-            this.classes = ['card', 'text-center', 'text-white', 'mt-5'];
+            this.classes = [config.CSS.bootstrapCardClasses.card, 'text-center', 'text-white', 'mt-5'];
             this.classes.forEach(className => movieCardElement.classList.add(className)); 
             //adding default class to the element in case they were not specified
         } else {
