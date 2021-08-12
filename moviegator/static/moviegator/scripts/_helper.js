@@ -75,7 +75,7 @@ export function removeMessageAlert() {
 
 
 // Render info paragraph (if none) inside parent 
-export function renderInfoHeader(text, parent) {
+export function renderInfo(text, parent) {
     if (!parent.querySelector(`p.${configuration.CSS.classes.info}`)) {
         const info = document.createElement('p');
         info.classList.add(configuration.CSS.classes.info, configuration.CSS.classes.marginTop5);

@@ -282,10 +282,14 @@ def get_watchlist(request):
             for obj in watchlist:
                 item = obj.movie
                 watchlist_to_render.append(item.serialize())
-            
-            return JsonResponse(watchlist_to_render, safe=False)
+
+            if len(watchlist_to_render) > 0:
+                return JsonResponse(watchlist_to_render, safe=False)
+            else: 
+                return JsonResponse({'empty': 'Watchlist is empty'})
+
         except UserActions.DoesNotExist:
-            return JsonResponse({'message': 'Watchlist is empty'})
+            return JsonResponse({'empty': 'Watchlist is empty'})
 
 
 @login_required
@@ -308,6 +312,71 @@ def remove_from_watchlist(request):
             movie_actions.save(update_fields=['watchlist'])
             return JsonResponse({'message': 'Removed from your watchlist'})
         except IntegrityError:
+            return JsonResponse({'error': 'Sorry, something went wrong'})
+    
+    # In case request was GET or not AJAX
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required
+def get_watched(request):
+    # Ensure request is AJAX
+    if request.is_ajax():
+        watched_to_render = []
+        try:
+            watched = UserActions.objects.filter(user=request.user, watched=True)
+            for obj in watched:
+                item = obj.movie
+                watched_to_render.append(item.serialize())
+
+            if len(watched_to_render) > 0:
+                return JsonResponse(watched_to_render, safe=False)
+            else:
+                return JsonResponse({'empty': 'List of watched is empty'})
+        
+        except UserActions.DoesNotExist:
+            return JsonResponse({'empty': 'List of watched is empty'})
+
+
+@login_required
+def mark_as_watched(request):
+    # Ensure POST-request is made by Javascript (fetch)
+    if request.method == "POST" and request.is_ajax():
+        # Getting JSON data
+        data = json.loads(request.body)
+        # Add movie/show details to MovieDB of this app or get movie (if already in MovieDB)
+        try:
+            imdb_id = data['imdb_id']
+            type = data['type']
+            title = data['title']
+            year = data['year']
+            image = data['image']
+            details = data['details']
+
+            movie = MovieDB(
+                imdb_id=imdb_id,
+                type=type,
+                title=title,
+                year=year,
+                image=image,
+                details=details
+            )
+
+            movie.save()
+
+        except IntegrityError:
+            movie = MovieDB.objects.get(imdb_id=data['imdb_id'])
+
+        # Mark as watched
+        obj, created = UserActions.objects.update_or_create(
+            user=request.user, 
+            movie=movie,
+            defaults={'watchlist': False, 'watched': True},
+        )
+        if obj:
+            return JsonResponse({'message': 'Successfully marked as watched'})
+        else:
             return JsonResponse({'error': 'Sorry, something went wrong'})
     
     # In case request was GET or not AJAX
