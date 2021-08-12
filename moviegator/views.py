@@ -165,18 +165,19 @@ def get_data(request, parameter):
             random_choice = random.choice(result["items"])
             processed = set()
 
-            # Ensure that user hasn't already interacted with this movie/show
-            watchlist = UserActions.objects.filter(user=request.user, watchlist=True).values_list('movie__imdb_id', flat=True)
-            watched_list = UserActions.objects.filter(user=request.user, watched=True).values_list('movie__imdb_id', flat=True)
-            # While random movie/show is known to user...
-            while random_choice["id"] in watchlist or random_choice["id"] in watched_list:
-                # ...remember that this random item was processed...
-                processed.add(random_choice["id"])
-                # ...if all items was already processed, return error and end loop...
-                if len(result["items"]) == len(processed):
-                    return JsonResponse({"empty": "Sorry, we have no more recommendations in this category which you haven't already added to your watchlist or marked as watched. Please start over."})
-                # ...else, try another random
-                random_choice = random.choice(result["items"])
+            if request.user.is_authenticated:
+                # Ensure that user hasn't already interacted with this movie/show
+                watchlist = UserActions.objects.filter(user=request.user, watchlist=True).values_list('movie__imdb_id', flat=True)
+                watched_list = UserActions.objects.filter(user=request.user, watched=True).values_list('movie__imdb_id', flat=True)
+                # While random movie/show is known to user...
+                while random_choice["id"] in watchlist or random_choice["id"] in watched_list:
+                    # ...remember that this random item was processed...
+                    processed.add(random_choice["id"])
+                    # ...if all items was already processed, return error and end loop...
+                    if len(result["items"]) == len(processed):
+                        return JsonResponse({"empty": "Sorry, we have no more recommendations in this category which you haven't already added to your watchlist or marked as watched. Please start over."})
+                    # ...else, try another random
+                    random_choice = random.choice(result["items"])
             
             return JsonResponse(random_choice)
         
@@ -204,18 +205,19 @@ def get_data_by_genre(request, type, genre):
             random_choice = random.choice(result["items"])
             processed = set()
 
-            # Ensure that user hasn't already interacted with this movie/show
-            watchlist = UserActions.objects.filter(user=request.user, watchlist=True).values_list('movie__imdb_id', flat=True)
-            watched_list = UserActions.objects.filter(user=request.user, watched=True).values_list('movie__imdb_id', flat=True)
-            # While random movie/show is known to user...
-            while random_choice["id"] in watchlist or random_choice["id"] in watched_list:
-                # ...remember that this item was processed
-                processed.add(random_choice["id"])
-                # ...if all items was already processed, return error and end loop...
-                if len(result["items"]) == len(processed):
-                    return JsonResponse({"empty": "Sorry, we have no more recommendations in this category which you haven't already added to your watchlist or marked as watched. Please start over."})
-                # ...else, try another random
-                random_choice = random.choice(result["items"])
+            if request.user.is_authenticated:
+                # Ensure that user hasn't already interacted with this movie/show
+                watchlist = UserActions.objects.filter(user=request.user, watchlist=True).values_list('movie__imdb_id', flat=True)
+                watched_list = UserActions.objects.filter(user=request.user, watched=True).values_list('movie__imdb_id', flat=True)
+                # While random movie/show is known to user...
+                while random_choice["id"] in watchlist or random_choice["id"] in watched_list:
+                    # ...remember that this item was processed
+                    processed.add(random_choice["id"])
+                    # ...if all items was already processed, return error and end loop...
+                    if len(result["items"]) == len(processed):
+                        return JsonResponse({"empty": "Sorry, we have no more recommendations in this category which you haven't already added to your watchlist or marked as watched. Please start over."})
+                    # ...else, try another random
+                    random_choice = random.choice(result["items"])
             
             return JsonResponse(random_choice)
 
@@ -227,10 +229,13 @@ def get_data_by_genre(request, type, genre):
         return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
-@login_required
 def add_to_watchlist(request):
-    # Ensure POST-request is made by Javascript (fetch)
-    if request.method == "POST" and request.is_ajax():
+    # In case user is anonymous
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Sorry, you should log in first'})
+
+    # Ensure POST-request is made by Javascript (fetch) and user is logged in
+    if request.method == "POST" and request.is_ajax() and request.user.is_authenticated:
         # Getting JSON data
         data = json.loads(request.body)
         # Add movie/show details to MovieDB of this app or get movie (if already in MovieDB)
@@ -339,10 +344,13 @@ def get_watched(request):
             return JsonResponse({'empty': 'List of watched is empty'})
 
 
-@login_required
 def mark_as_watched(request):
-    # Ensure POST-request is made by Javascript (fetch)
-    if request.method == "POST" and request.is_ajax():
+    # In case user is anonymous
+    if not request.user.is_authenticated:
+        return JsonResponse({'error': 'Sorry, you should log in first'})
+
+    # Ensure POST-request is made by Javascript (fetch) and user is logged in
+    if request.method == "POST" and request.is_ajax() and request.user.is_authenticated:
         # Getting JSON data
         data = json.loads(request.body)
         # Add movie/show details to MovieDB of this app or get movie (if already in MovieDB)
