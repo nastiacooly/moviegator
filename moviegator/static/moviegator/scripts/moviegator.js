@@ -463,6 +463,7 @@ class MovieCard {
 
     render(condition="for_result") {
         const movieCardElement = document.createElement('div');
+        let buttons;
 
         if (this.classes.length === 0) {
             this.classes = [config.CSS.bootstrapCardClasses.card, 'text-center', 'text-white', 'mt-5'];
@@ -474,55 +475,36 @@ class MovieCard {
         }
 
         if (condition === "for_result") {
-            movieCardElement.innerHTML = `
-            <img src=${this.src} class="card-img-top" alt=${this.alt}>
-            <div class="card-body">
-                <h5 class="card-title">${this.title}</h5>
-                <h6 class="card-subtitle mb-2">${this.year}</h6>
-                <p class="card-text">${this.descr}</p>
-                <button type="button" class="btn btn-outline-warning">
-                    <a href="https://www.imdb.com/title/${this.id}/" target="_blank">Details on IMDb</a>
-                </button>
+            buttons = `
                 <div class="d-flex flex-row justify-content-center mt-3">
                     <button title="Add to Watchlist" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watchlist" data-type=${this.type}>&#43;</button>
                     <button title="Mark as Watched" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>&#10003;</button>
                 </div>
-            </div>
             `;
         } else if (condition === "for_watchlist") {
-            movieCardElement.innerHTML = `
-            <img src=${this.src} class="card-img-top" alt=${this.alt}>
-            <div class="card-body">
-                <h5 class="card-title">${this.title}</h5>
-                <h6 class="card-subtitle mb-2">${this.year}</h6>
-                <p class="card-text">${this.descr}</p>
-                <button type="button" class="btn btn-outline-warning">
-                    <a href="https://www.imdb.com/title/${this.id}/" target="_blank">Details on IMDb</a>
-                </button>
+            buttons = `
                 <div class="d-flex flex-row justify-content-center mt-3">
                     <button title="Remove from Watchlist" class="btn btn-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watchlist" data-type=${this.type}>&#8722;</button>
                     <button title="Mark as Watched" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>&#10003;</button>
                 </div>
-            </div>
             `;
         } else if (condition === "for_watched") {
-            movieCardElement.innerHTML = `
-            <img src=${this.src} class="card-img-top" alt=${this.alt}>
-            <div class="card-body">
-                <h5 class="card-title">${this.title}</h5>
-                <h6 class="card-subtitle mb-2">${this.year}</h6>
-                <p class="card-text">${this.descr}</p>
-                <button type="button" class="btn btn-outline-warning">
-                    <a href="https://www.imdb.com/title/${this.id}/" target="_blank">Details on IMDb</a>
-                </button>
+            buttons = `
                 <div class="d-flex flex-row justify-content-center mt-3">
                     <button title="Rate This Title" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="rate" data-type=${this.type}>Rate</button>
                     <button title="Mark as Not Watched" class="btn btn-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>&#10003;</button>
                 </div>
-            </div>
             `;
         } else if (condition === "for_rated") {
-            movieCardElement.innerHTML = `
+            buttons = `
+                <div class="d-flex flex-row justify-content-center mt-3">
+                    <span class="rating">Rating: </span>
+                    <button title="Change Rating" class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id} data-action="rate" data-type=${this.type}>Change Rating</button>
+                </div>
+            `;
+        }
+
+        movieCardElement.innerHTML = `
             <img src=${this.src} class="card-img-top" alt=${this.alt}>
             <div class="card-body">
                 <h5 class="card-title">${this.title}</h5>
@@ -531,13 +513,9 @@ class MovieCard {
                 <button type="button" class="btn btn-outline-warning">
                     <a href="https://www.imdb.com/title/${this.id}/" target="_blank">Details on IMDb</a>
                 </button>
-                <div class="d-flex flex-row justify-content-center mt-3">
-                    <span class="rating">Rating: </span>
-                    <button title="Change Rating" class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id} data-action="rate" data-type=${this.type}>Change Rating</button>
-                </div>
+                ${buttons}
             </div>
             `;
-        }
         
         this.parent.append(movieCardElement); // adding to DOM
     }
@@ -569,10 +547,10 @@ function getCookie(name) {
 }
 
 
-/* Function for handling and rendering response data about a movie
+/* Function for handling and rendering recommended movie data
 Parameters: data - for JS-object with data, 
-detailsParameter - for data.key which contains details about a movie, 
-resultContainer - parent-element for rendering result,
+detailsParameter - for data.key which contains details about movie's stars/crew, 
+resultContainer - parent-element for rendering result in.
 */
 const renderResult = (data, detailsParameter, resultContainer) => {
     if (data.error) {
@@ -594,7 +572,7 @@ const renderResult = (data, detailsParameter, resultContainer) => {
 };
 
 
-/* Function for getting data from movie card by clicked button */
+/* Function for getting data about a movie through its card and clicked button */
 function returnMovieDetails(button) {
     // Saving movie/show details from DOM-elements...
     const image = document.querySelector(`.${config.CSS.bootstrapCardClasses.cardImg}`),
@@ -617,7 +595,7 @@ function returnMovieDetails(button) {
 }
 
 
-/* Function for getting movie IMDb-id from movie card by clicked button */
+/* Function for getting movie IMDb-id through clicked button */
 function returnMovieID(button) {
     // Get movie IMDb id from DOM...
     const imdb_id = button.dataset.id;

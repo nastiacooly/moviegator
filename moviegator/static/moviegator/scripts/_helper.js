@@ -95,7 +95,7 @@ export function renderSpinner(parent) {
 }
 
 
-// Function to make GET-requests which return JSON-data
+// Function to make GET-requests which returns JSON-data
 export const getResource = async (url) => {
     const result = await fetch(url, {
         headers: {
@@ -112,7 +112,7 @@ export const getResource = async (url) => {
 };
 
 
-// Function to make POST-requests which return JSON-data
+// Function to make POST-requests which returns JSON-data
 export const postData = async (url, data, csrftoken) => {
     const result = await fetch(url, {
         method: 'POST',
