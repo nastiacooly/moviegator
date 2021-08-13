@@ -29,11 +29,13 @@ const config = {
             profile: 'section-user',
             watchlist: 'section-watchlist',
             watched: 'section-watched',
+            modal: 'ratingModal'
         },
         containerClasses: {
             watchlist: 'watchlist-container',
             watched: 'watched-container',
-            result: 'result-container'
+            result: 'result-container',
+            modal: 'modal-container'
         },
         buttonsSelectors: {
             start: 'button[data-action="start"]',
@@ -47,7 +49,9 @@ const config = {
             watched: 'button[data-profile="watched"]',
             watchlistActions: 'button[data-action="watchlist"]',
             watchedActions: 'button[data-action="watched"]',
-            rateActions: 'button[data-action="rate"]'
+            rateActions: 'button[data-action="rate"]',
+            closeModal: 'button[data-modal="close"]',
+            saveRating: 'button[data-modal="save"]'
         },
         animationNames: {
             slideToTop: 'slideToTop',
@@ -89,7 +93,8 @@ const config = {
         removeFromWatchlist: '/remove_from_watchlist',
         getMovieData: '/get_data',
         markAsWatched: '/mark_as_watched',
-        markAsNotWatched: '/mark_as_not_watched'
+        markAsNotWatched: '/mark_as_not_watched',
+        saveRating: '/save_rating'
     },
     userLists: {
         watchlist: 'watchlist',
@@ -391,7 +396,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // See list of watched movies
+    // See list of watched movies (where user can also rate movies)
     const watchedBtn = document.querySelector(config.CSS.buttonsSelectors.watched);
     if (watchedBtn) {
         watchedBtn.addEventListener('click', () => {
@@ -408,30 +413,70 @@ document.addEventListener('DOMContentLoaded', () => {
                         // On click of these buttons
                         markAsNotWatchedBtns.forEach(button => {
                             button.addEventListener('click', (e) => {
-                                // Mark as not watched TODO
+                                // Mark as not watched
                                 removeFromUserList(config.userLists.watched, e.target);
                                 // Remove from 'watched' page
                                 removeMovieCardFromDOM(e.target);
                             });
                         });   
                     }
-                    // Rate a movie TOFINISH
-                    const ratingModal = document.getElementById('ratingModal');
+                    // Display modal to rate a movie
+                    const ratingModal = document.getElementById(config.CSS.sectionIDs.modal);
                     const openRatingModalBtns = sectionWatched.querySelectorAll(config.CSS.buttonsSelectors.rateActions);
-                    if (ratingModal && openRatingModalBtns) {
+                    let rating, movieID, newRating;
+                    if (openRatingModalBtns) {
                         openRatingModalBtns.forEach(button => {
                             button.addEventListener('click', (e) => {
+                                // Get movie details from button
                                 let title = e.target.getAttribute('data-title');
-                                let rating = e.target.getAttribute('data-rating');
+                                rating = e.target.getAttribute('data-rating');
+                                movieID = e.target.getAttribute('data-id');
+                                // Change modal header according to movie title
                                 let modalTitle = ratingModal.querySelector('.rating_modal-title');
-                                let modalRating = ratingModal.querySelector('.rating_modal-rate');
-                                modalTitle.textContent = `Rate ${title}`;
-                                modalRating.innerHTML = `
-                                ${config.HTMLSymbols.star.repeat(5)}
-                                `;
-                                helper.show(ratingModal);
+                                modalTitle.textContent = `Rate "${title}"`;
+                                // Get rating stars
+                                const stars = [...ratingModal.querySelector('.rating_modal-rate').children];
+                                // Color stars according to current user's rating of a movie
+                                colorUserRating(stars, rating);
+                                // Prevent page from scrolling with modal open
+                                document.body.classList.add('modal-open');
+                                // Show modal
+                                helper.show(ratingModal.closest(`div.${config.CSS.containerClasses.modal}`));
+                                // Color rating stars as user hovers mouse over and keep track of chosen rating
+                                stars.forEach(star => {
+                                    star.addEventListener('mouseover', (e) => {
+                                        newRating = colorChosenStars(e.target);
+                                    });
+                                });
                             });
-
+                        });
+                    }
+                    // Save rating
+                    const saveRatingBtn = ratingModal.querySelector(config.CSS.buttonsSelectors.saveRating);
+                    if (saveRatingBtn) {
+                        saveRatingBtn.addEventListener('click', (e) => {
+                            // Save rating to database
+                            saveRating(newRating, movieID);
+                            setTimeout(() => {
+                                // Enable page scrolling
+                                document.body.classList.remove('modal-open');
+                                // Hide modal
+                                helper.hide(ratingModal.closest(`div.${config.CSS.containerClasses.modal}`));
+                                // Change rating on a page
+                                watchedContainer.querySelector(`span.rating[data-id="${movieID}"]`).innerHTML = `
+                                    Rating: ${config.HTMLSymbols.star.repeat(parseInt(newRating))}
+                                `;
+                            }, 1000);
+                        });
+                    }
+                    // Close modal on click of a cancel button
+                    const closeModalBtn = ratingModal.querySelector(config.CSS.buttonsSelectors.closeModal);
+                    if (closeModalBtn) {
+                        closeModalBtn.addEventListener('click', (e) => {
+                            // Enable page scrolling
+                            document.body.classList.remove('modal-open');
+                            // Hide modal
+                            helper.hide(ratingModal.closest(`div.${config.CSS.containerClasses.modal}`));
                         });
                     }
                 });
@@ -496,7 +541,7 @@ class MovieCard {
         } else if (condition === "for_watched") {
             buttons = `
                 <div class="d-flex flex-column mt-3">
-                    <span class="rating">Rating: 
+                    <span class="rating" data-id=${this.id}>Rating: 
                     ${this.rating === 0 ? 'not rated' : config.HTMLSymbols.star.repeat(this.rating)} 
                     </span>
                     <div class="d-flex flex-row justify-content-center mt-3">
@@ -631,7 +676,7 @@ function returnMovieDetails(button) {
 }
 
 
-/* Function for getting movie IMDb-id through clicked button */
+/* Function for getting movie IMDb-id from clicked button */
 function returnMovieID(button) {
     // Get movie IMDb id from DOM...
     const imdb_id = button.dataset.id;
@@ -710,12 +755,80 @@ function removeFromUserList(list, button) {
 }
 
 
+/* Function to save user's movie rating to database */
+function saveRating(rating, movieID) {
+    let url = config.urlPaths.saveRating;
+
+    const movie_details = {
+        rating: rating,
+        imdb_id: movieID
+    };
+
+    const data = JSON.stringify(movie_details);
+    
+    // Make POST-request to add movie/show to movie database of the app and to watchlist
+    helper.postData(url, data, config.backend.csrftoken)
+    .then(data => {
+        if (data.error) {
+            // Render error message
+            helper.renderMessageAlert(data.error, config.CSS.bootstrapAlertTypes.danger);
+            // Remove error mssg after some time
+            setTimeout(helper.removeMessageAlert, 5000);
+        } else if (data.message) {
+            // Remove previous messages if any
+            helper.removeMessageAlert();
+            // Showing successful result message
+            helper.renderMessageAlert(data.message, config.CSS.bootstrapAlertTypes.success);
+            // Remove success mssg after some time
+            setTimeout(helper.removeMessageAlert, 3000);
+        }
+    });
+}
+
+
 /* Function to remove movie card from a page (DOM) */
 function removeMovieCardFromDOM(button) {
     // Identifying movie card by a clicked button
     let movieCard = button.closest(`div.${config.CSS.bootstrapCardClasses.card}`);
     helper.removeWithAnimation(movieCard, config.CSS.animationNames.disappear);
 }
+
+
+/* Colors stars according to user's rating given to a movie */
+function colorUserRating(stars, rating) {
+    stars.forEach(star => {
+        if (rating >= parseInt(star.getAttribute('data-rating'))) {
+            star.classList.remove('unchecked');
+            star.classList.add('checked');
+        } else {
+            star.classList.add('unchecked');
+            star.classList.remove('checked');
+        }
+    });
+}
+
+
+/* Colors chosen star and its previous siblings
+ * and returns chosen rating (as a String)
+ */
+function colorChosenStars(currentStar) {
+    currentStar.classList.remove('unchecked');
+    currentStar.classList.add('checked');
+    let previousStar = currentStar.previousElementSibling;
+    let nextStar = currentStar.nextElementSibling;
+    while (previousStar) {
+        previousStar.classList.remove('unchecked');
+        previousStar.classList.add('checked');
+        previousStar = previousStar.previousElementSibling;
+    }
+    while (nextStar) {
+        nextStar.classList.remove('checked');
+        nextStar.classList.add('unchecked');
+        nextStar = nextStar.nextElementSibling;
+    }
+    return currentStar.getAttribute('data-rating');
+}
+
 
 /*
 End of functions

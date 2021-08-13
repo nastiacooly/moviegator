@@ -18,4 +18,5 @@ urlpatterns = [
     path('mark_as_watched', views.mark_as_watched),
     path('get_watched', views.get_watched),
     path('mark_as_not_watched', views.mark_as_not_watched),
+    path('save_rating', views.save_rating)
 ]
