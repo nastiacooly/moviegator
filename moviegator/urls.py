@@ -16,5 +16,6 @@ urlpatterns = [
     path('get_watchlist', views.get_watchlist),
     path('remove_from_watchlist', views.remove_from_watchlist),
     path('mark_as_watched', views.mark_as_watched),
-    path('get_watched', views.get_watched)
+    path('get_watched', views.get_watched),
+    path('mark_as_not_watched', views.mark_as_not_watched),
 ]

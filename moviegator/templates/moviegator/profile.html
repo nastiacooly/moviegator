@@ -8,7 +8,17 @@
 
     <span class="menu-arrow" data-slide="down">menu &#8595;</span>
 
-        {% if user.is_authenticated %}
+    {% if user.is_authenticated %}
+
+        <!--Modal to rate movie -->
+        <div style="display: none;" id="ratingModal">
+            <div class="rating_modal-title">Rate this movie</div>
+            <div class="rating_modal-rate">Star</div>
+            <div>
+                <button>Cancel</button>
+                <button>Save</button>
+            </div>
+        </div>
 
         <!--User's info section -->
         <div class="text-center" id="section-user">
@@ -31,9 +41,6 @@
                     </button>
                     <button class="btn btn-outline-light btn-lg mx-2" type="button" data-profile="watched">
                         Watched
-                    </button>
-                    <button class="btn btn-outline-light btn-lg mx-2" type="button" data-profile="rated">
-                        Rated
                     </button>
                 </div>
 
@@ -71,25 +78,9 @@
                 </div>
             </section>
 
-            <!--Section with titles rated by user -->
-            <section style="display: none;" class="inner-section" id='section-rated'>
-                <div class="container text-center d-flex flex-column justify-content-between">
-                    <div class="px-5">
-
-                        <h1>You rated these titles</h1>
-
-                        <div class="rated-container d-flex flex-row flex-wrap justify-content-around">
-                            
-                        </div>
-
-                    </div>
-
-                </div>
-            </section>
-
         </div>
 
-        {% else %}
+    {% else %}
 
         <div class="text-center" id="section-user">
 
@@ -106,6 +97,6 @@
 
         </div>
 
-        {% endif %}
+    {% endif %}
 
 {% endblock %}

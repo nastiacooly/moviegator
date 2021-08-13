@@ -29,7 +29,6 @@ const config = {
             profile: 'section-user',
             watchlist: 'section-watchlist',
             watched: 'section-watched',
-            rated: 'section-rated'
         },
         containerClasses: {
             watchlist: 'watchlist-container',
@@ -47,7 +46,8 @@ const config = {
             watchlist: 'button[data-profile="watchlist"]',
             watched: 'button[data-profile="watched"]',
             watchlistActions: 'button[data-action="watchlist"]',
-            watchedActions: 'button[data-action="watched"]'
+            watchedActions: 'button[data-action="watched"]',
+            rateActions: 'button[data-action="rate"]'
         },
         animationNames: {
             slideToTop: 'slideToTop',
@@ -73,7 +73,11 @@ const config = {
     },
     HTMLSymbols: {
         arrowUp: '&#8593;',
-        arrowDown: '&#8595;'
+        arrowDown: '&#8595;',
+        plus: '&#43;',
+        check: '&#10003;',
+        minus: '&#8722;',
+        star: '&#9733;'
     },
     backend: {
         csrftoken: getCookie('csrftoken')
@@ -84,12 +88,12 @@ const config = {
         addToWatchlist: '/add_to_watchlist',
         removeFromWatchlist: '/remove_from_watchlist',
         getMovieData: '/get_data',
-        markAsWatched: '/mark_as_watched'
+        markAsWatched: '/mark_as_watched',
+        markAsNotWatched: '/mark_as_not_watched'
     },
     userLists: {
         watchlist: 'watchlist',
-        watched: 'watched',
-        rated: 'rated'
+        watched: 'watched'
     }
 };
 
@@ -113,7 +117,6 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionUser = document.querySelector(`#${config.CSS.sectionIDs.profile}`),
         sectionWatchlist = document.querySelector(`#${config.CSS.sectionIDs.watchlist}`),
         sectionWatched = document.querySelector(`#${config.CSS.sectionIDs.watched}`),
-        sectionRated = document.querySelector(`#${config.CSS.sectionIDs.rated}`),
         watchlistContainer = document.querySelector(`.${config.CSS.containerClasses.watchlist}`),
         watchedContainer = document.querySelector(`.${config.CSS.containerClasses.watched}`);
 
@@ -350,23 +353,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (watchlistContainer.childElementCount === 0) {
                 helper.getResource(config.urlPaths.watchlist)
                 .then(data => {
-                    if (data.empty) {
-                        // Rendering info message
-                        helper.renderInfo(data.empty, watchlistContainer);
-                    } else {
-                        // Creating movie cards and rendering them
-                        data.forEach(item => {
-                            // Setting type of title
-                            let type = '';
-                            if (item.type === "m") {
-                                type = 'movie';
-                            } else if (item.type === "s") {
-                                type = "show";
-                            }
-                            let movie = new MovieCard(item.image, 'poster', item.title, item.year, item.details, item.imdb_id, type, watchlistContainer);
-                            movie.render("for_watchlist");
-                        });
-                    }
+                    renderMovieCards(data, config.userLists.watchlist, watchlistContainer);
                 })
                 .then(() => {
                     // Get 'Remove from Watchlist' buttons
@@ -376,7 +363,7 @@ document.addEventListener('DOMContentLoaded', () => {
                         removeFromWatchlistBtns.forEach(button => {
                             button.addEventListener('click', (e) => {
                                 // Remove from watchlist database
-                                removeFromWatchlist(e.target);
+                                removeFromUserList(config.userLists.watchlist, e.target);
                                 // Remove from watchlist's page
                                 removeMovieCardFromDOM(e.target);
                             });
@@ -400,7 +387,6 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show watchlist and hide other section
             helper.show(sectionWatchlist);
             helper.hide(sectionWatched);
-            helper.hide(sectionRated);
         });
     }
 
@@ -413,21 +399,39 @@ document.addEventListener('DOMContentLoaded', () => {
             if (watchedContainer.childElementCount === 0) {
                 helper.getResource(config.urlPaths.watched)
                 .then(data => {
-                    if (data.empty) {
-                        // Rendering info message
-                        helper.renderInfo(data.empty, watchedContainer);
-                    } else {
-                        // Creating movie cards and rendering them
-                        data.forEach(item => {
-                            // Setting type of title
-                            let type = '';
-                            if (item.type === "m") {
-                                type = 'movie';
-                            } else if (item.type === "s") {
-                                type = "show";
-                            }
-                            let movie = new MovieCard(item.image, 'poster', item.title, item.year, item.details, item.imdb_id, type, watchedContainer);
-                            movie.render("for_watched");
+                    renderMovieCards(data, config.userLists.watched, watchedContainer);
+                })
+                .then(() => {
+                    // Get 'Mark as Not Watched' buttons
+                    const markAsNotWatchedBtns = sectionWatched.querySelectorAll(config.CSS.buttonsSelectors.watchedActions);
+                    if (markAsNotWatchedBtns) {
+                        // On click of these buttons
+                        markAsNotWatchedBtns.forEach(button => {
+                            button.addEventListener('click', (e) => {
+                                // Mark as not watched TODO
+                                removeFromUserList(config.userLists.watched, e.target);
+                                // Remove from 'watched' page
+                                removeMovieCardFromDOM(e.target);
+                            });
+                        });   
+                    }
+                    // Rate a movie TOFINISH
+                    const ratingModal = document.getElementById('ratingModal');
+                    const openRatingModalBtns = sectionWatched.querySelectorAll(config.CSS.buttonsSelectors.rateActions);
+                    if (ratingModal && openRatingModalBtns) {
+                        openRatingModalBtns.forEach(button => {
+                            button.addEventListener('click', (e) => {
+                                let title = e.target.getAttribute('data-title');
+                                let rating = e.target.getAttribute('data-rating');
+                                let modalTitle = ratingModal.querySelector('.rating_modal-title');
+                                let modalRating = ratingModal.querySelector('.rating_modal-rate');
+                                modalTitle.textContent = `Rate ${title}`;
+                                modalRating.innerHTML = `
+                                ${config.HTMLSymbols.star.repeat(5)}
+                                `;
+                                helper.show(ratingModal);
+                            });
+
                         });
                     }
                 });
@@ -435,9 +439,9 @@ document.addEventListener('DOMContentLoaded', () => {
             // Show watched and hide other section
             helper.show(sectionWatched);
             helper.hide(sectionWatchlist);
-            helper.hide(sectionRated);
         });
     }
+    
 });
 /*
 End of dynamic page scripts
@@ -448,7 +452,7 @@ End of dynamic page scripts
 Class for movie card
  */
 class MovieCard {
-    constructor(src, alt, title, year, descr, id, type, parentElement, ...classes) {
+    constructor(src, alt, title, year, descr, id, type, rating, parentElement, ...classes) {
         this.src = src;
         this.alt = alt;
         this.title = title;
@@ -456,6 +460,7 @@ class MovieCard {
         this.descr = descr;
         this.id = id;
         this.type = type;
+        this.rating = parseInt(rating);
         this.classes = classes;
         this.parent = parentElement;
         
@@ -477,29 +482,27 @@ class MovieCard {
         if (condition === "for_result") {
             buttons = `
                 <div class="d-flex flex-row justify-content-center mt-3">
-                    <button title="Add to Watchlist" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watchlist" data-type=${this.type}>&#43;</button>
-                    <button title="Mark as Watched" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>&#10003;</button>
+                    <button title="Add to Watchlist" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watchlist" data-type=${this.type}>${config.HTMLSymbols.plus}</button>
+                    <button title="Mark as Watched" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>${config.HTMLSymbols.check}</button>
                 </div>
             `;
         } else if (condition === "for_watchlist") {
             buttons = `
                 <div class="d-flex flex-row justify-content-center mt-3">
-                    <button title="Remove from Watchlist" class="btn btn-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watchlist" data-type=${this.type}>&#8722;</button>
-                    <button title="Mark as Watched" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>&#10003;</button>
+                    <button title="Remove from Watchlist" class="btn btn-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watchlist" data-type=${this.type}>${config.HTMLSymbols.minus}</button>
+                    <button title="Mark as Watched" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>${config.HTMLSymbols.check}</button>
                 </div>
             `;
         } else if (condition === "for_watched") {
             buttons = `
-                <div class="d-flex flex-row justify-content-center mt-3">
-                    <button title="Rate This Title" class="btn btn-outline-light btn-lg mx-2" type="button" data-id=${this.id} data-action="rate" data-type=${this.type}>Rate</button>
-                    <button title="Mark as Not Watched" class="btn btn-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>&#10003;</button>
-                </div>
-            `;
-        } else if (condition === "for_rated") {
-            buttons = `
-                <div class="d-flex flex-row justify-content-center mt-3">
-                    <span class="rating">Rating: </span>
-                    <button title="Change Rating" class="btn btn-outline-light btn-sm mx-2" type="button" data-id=${this.id} data-action="rate" data-type=${this.type}>Change Rating</button>
+                <div class="d-flex flex-column mt-3">
+                    <span class="rating">Rating: 
+                    ${this.rating === 0 ? 'not rated' : config.HTMLSymbols.star.repeat(this.rating)} 
+                    </span>
+                    <div class="d-flex flex-row justify-content-center mt-3">
+                        <button title="Change Rating" class="btn btn-outline-light btn-lg mx-2" type="button" data-title="${this.title}" data-rating=${this.rating} data-id=${this.id} data-action="rate" data-type=${this.type}>${config.HTMLSymbols.star}</button>
+                        <button title="Mark as Not Watched" class="btn btn-light btn-lg mx-2" type="button" data-id=${this.id} data-action="watched" data-type=${this.type}>${config.HTMLSymbols.check}</button>
+                    </div>
                 </div>
             `;
         }
@@ -566,8 +569,41 @@ const renderResult = (data, detailsParameter, resultContainer) => {
         // Removing spinner
         spinner.remove();
         // Creating movie card and rendering it
-        let result = new MovieCard(data.image, 'poster', data.title, data.year, detailsParameter, data.id, userChoices.movieOrShow, resultContainer);
+        let result = new MovieCard(data.image, 'poster', data.title, data.year, detailsParameter, data.id, userChoices.movieOrShow, '0', resultContainer);
         result.render();
+    }
+};
+
+
+/* 
+ * Function to render movie cards from user's lists.
+ * Parameters: data - for JS-object with data,
+ * list - for profile's section where cards will be rendered,
+ * container - parent-element for rendering in.
+*/
+const renderMovieCards = (data, list, container) => {
+    if (data.empty) {
+        // Rendering info message
+        helper.renderInfo(data.empty, container);
+    } else {
+        // Creating movie cards and rendering them
+        data.forEach(item => {
+            // Setting type of title
+            let type = '';
+            if (item.type === "m") {
+                type = 'movie';
+            } else if (item.type === "s") {
+                type = "show";
+            }
+            // Creating card
+            let movie = new MovieCard(item.image, 'poster', item.title, item.year, item.details, item.imdb_id, type, item.rating, container);
+            // Render depending on specified list
+            if (list === config.userLists.watchlist) {
+                movie.render("for_watchlist");
+            } else if (list === config.userLists.watched) {
+                movie.render("for_watched");
+            }
+        });
     }
 };
 
@@ -641,13 +677,21 @@ function addToUserList(list, button) {
 }
 
 
-/* Function to remove clicked title from watchlist database */
-function removeFromWatchlist(button) {
+/* Function to remove clicked title from specified user's list in database */
+function removeFromUserList(list, button) {
+    let url = '';
     // Get movie IMDb id...
     const data = returnMovieID(button);
 
+    // Set url for POST-request
+    if (list === config.userLists.watchlist) {
+        url = config.urlPaths.removeFromWatchlist;
+    } else if (list === config.userLists.watched) {
+        url = config.urlPaths.markAsNotWatched;
+    }
+
     // Make POST-request to remove movie/show from user's watchlist
-    helper.postData(config.urlPaths.removeFromWatchlist, data, config.backend.csrftoken)
+    helper.postData(url, data, config.backend.csrftoken)
     .then(data => {
         if (data.error) {
             // Render error message
@@ -669,7 +713,7 @@ function removeFromWatchlist(button) {
 /* Function to remove movie card from a page (DOM) */
 function removeMovieCardFromDOM(button) {
     // Identifying movie card by a clicked button
-    let movieCard = button.parentElement.parentElement.parentElement;
+    let movieCard = button.closest(`div.${config.CSS.bootstrapCardClasses.card}`);
     helper.removeWithAnimation(movieCard, config.CSS.animationNames.disappear);
 }
 

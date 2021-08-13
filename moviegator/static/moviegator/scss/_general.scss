@@ -46,7 +46,7 @@ body {
     background-color: rgba(0, 0, 0, 0) !important;
     border: none !important;
     &>img {
-        max-height: 30vh !important;
+        height: 30vh !important;
         object-fit: contain !important;
     }
 }
@@ -162,4 +162,9 @@ div {
     &-exitScreen {
         animation: exitScreen 1s linear 0s 1 normal forwards;
     }
+}
+
+#ratingModal {
+    position: relative;
+    z-index: 1000;
 }

@@ -30,6 +30,7 @@ class MovieDB(models.Model):
             "year": self.year,
             "image": self.image,
             "details": self.details,
+            "rating": self.movie_actions.rating
         }
 
 

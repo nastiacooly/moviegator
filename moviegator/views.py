@@ -124,10 +124,10 @@ def register(request):
         return render(request, "moviegator/register.html")
 
 
-@login_required
 def profile_view(request):
     """
     Renders profile page of signed in user
+    or suggests anonymous user to log in or register
     """
     user = request.user
     return render(
@@ -385,6 +385,34 @@ def mark_as_watched(request):
         if obj:
             return JsonResponse({'message': 'Successfully marked as watched'})
         else:
+            return JsonResponse({'error': 'Sorry, something went wrong'})
+    
+    # In case request was GET or not AJAX
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+@login_required
+def mark_as_not_watched(request):
+    # Ensure POST-request is made by Javascript (fetch)
+    if request.method == "POST" and request.is_ajax():
+        # Getting JSON data
+        data = json.loads(request.body)
+        imdb_id = data['imdb_id']
+        # Get movie from MovieDB
+        try:
+            movie = MovieDB.objects.get(imdb_id=imdb_id)
+        except MovieDB.DoesNotExist:
+            return JsonResponse({'error': 'This title was not found'})
+
+        # Mark as not watched
+        movie_actions = movie.movie_actions
+        try:
+            movie_actions.watched = False
+            movie_actions.rating = '0'
+            movie_actions.save(update_fields=['watched', 'rating'])
+            return JsonResponse({'message': 'Marked as not watched'})
+        except IntegrityError:
             return JsonResponse({'error': 'Sorry, something went wrong'})
     
     # In case request was GET or not AJAX
