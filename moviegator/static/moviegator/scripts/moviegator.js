@@ -16,7 +16,6 @@ This is the configuration for the application.
 Do not change anything here unless something has changed 
 in HTML-structure, CSS or Django (backend).
 */
-
 const config = {
     CSS: {
         sectionIDs: {
@@ -35,23 +34,31 @@ const config = {
             watchlist: 'watchlist-container',
             watched: 'watched-container',
             result: 'result-container',
-            modal: 'modal-container'
+            modal: 'modal-container',
+            choices: 'choices-container'
         },
-        buttonsSelectors: {
-            start: 'button[data-action="start"]',
-            typeChoice: 'button[data-type]',
-            randomChoice: 'button[data-random]',
-            moodBase: 'button[data-base="mood"]',
-            genreBase: 'button[data-base="genre"]',
-            genreChoice: 'button[data-genre]',
-            moreResults: 'button[data-action="more"]',
-            watchlist: 'button[data-profile="watchlist"]',
-            watched: 'button[data-profile="watched"]',
-            watchlistActions: 'button[data-action="watchlist"]',
-            watchedActions: 'button[data-action="watched"]',
-            rateActions: 'button[data-action="rate"]',
-            closeModal: 'button[data-modal="close"]',
-            saveRating: 'button[data-modal="save"]'
+        buttonsAttributes: {
+            action: 'data-action',
+            random: 'data-random',
+            type: 'data-type',
+            base: 'data-base',
+            genre: 'data-genre',
+            profile: 'data-profile',
+            modal: 'data-modal',
+            starRating: 'data-rating'
+        },
+        buttonsAttrValues: {
+            actionStart: 'start',
+            actionWatchlist: 'watchlist',
+            actionWatched: 'watched',
+            actionMore: 'more',
+            actionRate: 'rate',
+            baseMood: 'mood',
+            baseGenre: 'genre',
+            profileWatchlist: 'watchlist',
+            profileWatched: 'watched',
+            modalClose: 'close',
+            modalSave: 'save'
         },
         animationNames: {
             slideToTop: 'slideToTop',
@@ -101,7 +108,6 @@ const config = {
         watched: 'watched'
     }
 };
-
 /*
 End of configuration
 */
@@ -111,19 +117,21 @@ End of configuration
 Dynamic page scripts 
 */
 document.addEventListener('DOMContentLoaded', () => {
-    // Variables for app sections
+    // Variables for static sections/containers of the app
     const sectionWelcome = document.querySelector(`#${config.CSS.sectionIDs.welcome}`),
         sectionStart = document.querySelector(`#${config.CSS.sectionIDs.start}`),
         sectionMoodGenre = document.querySelector(`#${config.CSS.sectionIDs.moodOrGenre}`),
         sectionMood = document.querySelector(`#${config.CSS.sectionIDs.mood}`),
         sectionGenre = document.querySelector(`#${config.CSS.sectionIDs.genre}`),
+        choicesContainers = document.querySelectorAll(`.${config.CSS.containerClasses.choices}`),
         sectionResult = document.querySelector(`#${config.CSS.sectionIDs.result}`),
         resultContainer = document.querySelector(`.${config.CSS.containerClasses.result}`),
         sectionUser = document.querySelector(`#${config.CSS.sectionIDs.profile}`),
         sectionWatchlist = document.querySelector(`#${config.CSS.sectionIDs.watchlist}`),
         sectionWatched = document.querySelector(`#${config.CSS.sectionIDs.watched}`),
         watchlistContainer = document.querySelector(`.${config.CSS.containerClasses.watchlist}`),
-        watchedContainer = document.querySelector(`.${config.CSS.containerClasses.watched}`);
+        watchedContainer = document.querySelector(`.${config.CSS.containerClasses.watched}`),
+        ratingModal = document.getElementById(config.CSS.sectionIDs.modal);
 
 
     // Navbar hide/show
@@ -149,156 +157,88 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
 
-    /* 
-    Mutations observer for the result section.
-    It adds eventListeners on buttons in movie cards which are
-    dynamically rendered on a page.
-    */
-    // Options for the observer (which mutations to observe)
-    const params = { childList: true };
-    // Callback function to execute when mutations are observed
-    function callback(mutations, observer) {
-        mutations.forEach(mutation => {
-            mutation.addedNodes.forEach(node => {
-                // If movie card was rendered
-                if (node.classList.contains(config.CSS.bootstrapCardClasses.card)) {
-                    // Get 'Add to watchlist' button
-                    const addToWatchlistBtn = sectionResult.querySelector(config.CSS.buttonsSelectors.watchlistActions);
-                    if (addToWatchlistBtn) {
-                        // On click of this button
-                        addToWatchlistBtn.addEventListener('click', (e) => {
-                            addToUserList(config.userLists.watchlist, e.target);
-                        });
-                    }
-                    // Get 'Mark as Watched' button
-                    const markAsWatchedBtn = sectionResult.querySelector(config.CSS.buttonsSelectors.watchedActions);
-                    if (markAsWatchedBtn) {
-                        // On click of this button
-                        markAsWatchedBtn.addEventListener('click', (e) => {
-                            addToUserList(config.userLists.watched, e.target);
-                        });
-                    }
-                }
-            });
-        });
-    }
-    // Create observer instance linked to the callback function
-    const observer = new MutationObserver(callback);
-    // Mutations observer start and disconnect in corresponding sections
+    // Welcome section
     if (sectionWelcome) {
-        observer.observe(resultContainer, params);
-    }
-    if (sectionUser) {
-        observer.disconnect();
-    }
-
-
-    // Click 'Start' btn to enter start section
-    const startBtn = document.querySelector(config.CSS.buttonsSelectors.start);
-    if (startBtn) {
-        startBtn.addEventListener('click', function(e) {
-            e.preventDefault();
-            // Hiding current section and showing next section
-            helper.hideWithAnimation(sectionWelcome, config.CSS.animationNames.slideToTop);
-            helper.show(sectionStart);
+        sectionWelcome.addEventListener('click', (e) => {
+            // Clicking 'start' button
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.action) === config.CSS.buttonsAttrValues.actionStart) {
+                // Hiding current section and showing next section
+                helper.hideWithAnimation(sectionWelcome, config.CSS.animationNames.slideToTop);
+                helper.show(sectionStart);
+            }
         });
     }
 
 
     // Start section
     if (sectionStart) {
-        // Start choice (Movie or TV Show)
-        const firstChoiceButtons = sectionStart.querySelectorAll(config.CSS.buttonsSelectors.typeChoice);
-        if (firstChoiceButtons) {
-            firstChoiceButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    // Disabling not clicked button
-                    if (e.target === firstChoiceButtons[0]) {
-                        firstChoiceButtons[1].setAttribute('disabled', true);
-                        button.removeAttribute('disabled');
-                    } else if (e.target === firstChoiceButtons[1]) {
-                        firstChoiceButtons[0].setAttribute('disabled', true);
-                        button.removeAttribute('disabled');
-                    }
-                    // Storing user's choice to variable
-                    userChoices.movieOrShow = e.target.dataset.type;
-                    // Hiding current section's content and showing next section's content
-                    helper.hideWithAnimation(sectionStart, config.CSS.animationNames.disappear);
-                    helper.showWithAnimation(sectionMoodGenre, config.CSS.animationNames.appear);
-                });
-            });
-        }
-
-
-        // Start choice (for Random)
-        const randomButtons = sectionStart.querySelectorAll(config.CSS.buttonsSelectors.randomChoice);
-        if (randomButtons) {
-            randomButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
-                    // Saving user's choice
-                    userChoices.randomType = e.target.dataset.random;
+        sectionStart.addEventListener('click', (e) => {
+            // Movie or TV Show choice
+            if (e.target.hasAttribute(config.CSS.buttonsAttributes.type)) {
+                // Disabling not clicked button
+                e.target.closest(`button[${config.CSS.buttonsAttributes.type}]`).setAttribute('disabled', true);
+                e.target.removeAttribute('disabled');
+                // Storing user's choice to variable
+                userChoices.movieOrShow = e.target.dataset.type;
+                // Hiding current section's content and showing next section's content
+                helper.hideWithAnimation(sectionStart, config.CSS.animationNames.disappear);
+                helper.showWithAnimation(sectionMoodGenre, config.CSS.animationNames.appear);
+            }
+            
+            // Random type choice
+            if (e.target.hasAttribute(config.CSS.buttonsAttributes.random)) {
+                // Saving user's choice
+                userChoices.randomType = e.target.dataset.random;
+                if (userChoices.randomType === 'top-shows') {
+                    userChoices.movieOrShow = 'show';
+                } else {
+                    userChoices.movieOrShow = 'movie';
+                }
+                // Hiding current section
+                helper.hideWithAnimation(sectionStart, config.CSS.animationNames.slideToTop);
+                // Showing result section
+                helper.show(sectionResult);
+                // Showing spinner while JSON loads
+                spinner = helper.renderSpinner(resultContainer);
+                // Getting random movie from requested category
+                helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.randomType}`)
+                .then(data => {
                     if (userChoices.randomType === 'top-shows') {
-                        userChoices.movieOrShow = 'show';
+                        renderResult(data, data.crew, resultContainer);
                     } else {
-                        userChoices.movieOrShow = 'movie';
+                    renderResult(data, data.stars, resultContainer);
                     }
-                    // Hiding previous section
-                    helper.hideWithAnimation(sectionStart, config.CSS.animationNames.slideToTop);
-                    // Showing result section
-                    helper.show(sectionResult);
-                    // Showing spinner while JSON loads
-                    spinner = helper.renderSpinner(resultContainer);
-                    // Getting random movie from requested category
-                    helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.randomType}`)
-                    .then(data => {
-                        if (userChoices.randomType === 'top-shows') {
-                            renderResult(data, data.crew, resultContainer);
-                        } else {
-                        renderResult(data, data.stars, resultContainer);
-                        }
-                    });
                 });
-
-            });
-        }
+            }
+        });
     }
 
 
-    // 'Mood or genre' choice
+    // Mood or genre base choice section
     if (sectionMoodGenre) {
-        const moodBtn = sectionMoodGenre.querySelector(config.CSS.buttonsSelectors.moodBase);
-        const genreBtn = sectionMoodGenre.querySelector(config.CSS.buttonsSelectors.genreBase);
-
-        if(moodBtn) {
-            // Clicking 'mood' button shows section for mood choice
-            moodBtn.addEventListener('click', () => {
+        sectionMoodGenre.addEventListener('click', (e) => {
+            if (e.target.hasAttribute(config.CSS.buttonsAttributes.base)) {
                 // Hiding current section
                 helper.hideWithAnimation(sectionMoodGenre, config.CSS.animationNames.disappear);
-                // Showing next section
-                helper.showWithAnimation(sectionMood, config.CSS.animationNames.appear);
-            });
-        }
-
-        if(genreBtn) {
-            // Clicking 'genre' button shows section for genre choice
-            genreBtn.addEventListener('click', () => {
-                // Hiding current section
-                helper.hideWithAnimation(sectionMoodGenre, config.CSS.animationNames.disappear);
-                // Showing next section
-                helper.showWithAnimation(sectionGenre, config.CSS.animationNames.appear);
-            });
-        }
+                if (e.target.getAttribute(config.CSS.buttonsAttributes.base) === config.CSS.buttonsAttrValues.baseMood) {
+                    // Showing next section (mood)
+                    helper.showWithAnimation(sectionMood, config.CSS.animationNames.appear);
+                }
+                if (e.target.getAttribute(config.CSS.buttonsAttributes.base) === config.CSS.buttonsAttrValues.baseGenre) {
+                    // Showing next section (genre)
+                    helper.showWithAnimation(sectionGenre, config.CSS.animationNames.appear);
+                }
+            }
+        });
     }
-    
 
-    // Genre choice (based on mood or genre itself)
+
+    // Genre choice section (based on mood or genre itself)
     if (sectionMood || sectionGenre) {
-        const genreChoiceButtons = document.querySelectorAll(config.CSS.buttonsSelectors.genreChoice);
-
-        if (genreChoiceButtons) {
-            // Choosing genre (by clicking button with mood or genre) shows section with movie recommendation
-            genreChoiceButtons.forEach(button => {
-                button.addEventListener('click', (e) => {
+        choicesContainers.forEach(container => {
+            container.addEventListener('click', (e) => {
+                // Clicking on a mood or a genre
+                if (e.target.hasAttribute(config.CSS.buttonsAttributes.genre)) {
                     // Saving genre choice
                     userChoices.genre = e.target.dataset.genre;
                     // Hiding current section
@@ -313,16 +253,25 @@ document.addEventListener('DOMContentLoaded', () => {
                     .then(data => {
                         renderResult(data, data.description, resultContainer);
                     });
-                });
+                }
             });
-        }
+        });
     }
 
-    // More results for user's preferences
+
+    // Result section with recommendation
     if (sectionResult) {
-        const moreButton = sectionResult.querySelector(config.CSS.buttonsSelectors.moreResults);
-        if (moreButton) {
-            moreButton.addEventListener('click', (e) => {
+        sectionResult.addEventListener('click', (e) => {
+            // Add to watchlist button handler
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.action) === config.CSS.buttonsAttrValues.actionWatchlist) {
+                addToUserList(config.userLists.watchlist, e.target);
+            }
+            // 'Mark as Watched' button handler
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.action) === config.CSS.buttonsAttrValues.actionWatched) {
+                addToUserList(config.userLists.watched, e.target);
+            }
+            // 'More results' button handler
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.action) === config.CSS.buttonsAttrValues.actionMore) {
                 // Remove previous result element
                 const previousResult = sectionResult.querySelector(`div.${config.CSS.bootstrapCardClasses.card}`);
                 previousResult.remove();
@@ -346,147 +295,128 @@ document.addEventListener('DOMContentLoaded', () => {
                         renderResult(data, data.description, resultContainer);
                     });
                 }
-            });
-        }
-    }
-
-    // See watchlist
-    const watchlistBtn = document.querySelector(config.CSS.buttonsSelectors.watchlist);
-    if (watchlistBtn) {
-        watchlistBtn.addEventListener('click', (e) => {
-            // Getting watchlist from server (only if it hasn't been rendered before)
-            if (watchlistContainer.childElementCount === 0) {
-                helper.getResource(config.urlPaths.watchlist)
-                .then(data => {
-                    renderMovieCards(data, config.userLists.watchlist, watchlistContainer);
-                })
-                .then(() => {
-                    // Get 'Remove from Watchlist' buttons
-                    const removeFromWatchlistBtns = sectionWatchlist.querySelectorAll(config.CSS.buttonsSelectors.watchlistActions);
-                    if (removeFromWatchlistBtns) {
-                        // On click of these buttons
-                        removeFromWatchlistBtns.forEach(button => {
-                            button.addEventListener('click', (e) => {
-                                // Remove from watchlist database
-                                removeFromUserList(config.userLists.watchlist, e.target);
-                                // Remove from watchlist's page
-                                removeMovieCardFromDOM(e.target);
-                            });
-                        });
-                    }
-                    // Get 'Mark as Watched' buttons
-                    const markAsWatchedBtns = sectionWatchlist.querySelectorAll(config.CSS.buttonsSelectors.watchedActions);
-                    if (markAsWatchedBtns) {
-                        // On click of these buttons
-                        markAsWatchedBtns.forEach(button => {
-                            button.addEventListener('click', (e) => {
-                                // Mark as watched
-                                addToUserList(config.userLists.watched, e.target);
-                                // Remove from watchlist's page
-                                removeMovieCardFromDOM(e.target);
-                            });
-                        });   
-                    }
-                });
             }
-            // Show watchlist and hide other section
-            helper.show(sectionWatchlist);
-            helper.hide(sectionWatched);
         });
     }
 
 
-    // See list of watched movies (where user can also rate movies)
-    const watchedBtn = document.querySelector(config.CSS.buttonsSelectors.watched);
-    if (watchedBtn) {
-        watchedBtn.addEventListener('click', () => {
-            // Getting watchlist from server (only if it hasn't been rendered before)
-            if (watchedContainer.childElementCount === 0) {
-                helper.getResource(config.urlPaths.watched)
-                .then(data => {
-                    renderMovieCards(data, config.userLists.watched, watchedContainer);
-                })
-                .then(() => {
-                    // Get 'Mark as Not Watched' buttons
-                    const markAsNotWatchedBtns = sectionWatched.querySelectorAll(config.CSS.buttonsSelectors.watchedActions);
-                    if (markAsNotWatchedBtns) {
-                        // On click of these buttons
-                        markAsNotWatchedBtns.forEach(button => {
-                            button.addEventListener('click', (e) => {
-                                // Mark as not watched
-                                removeFromUserList(config.userLists.watched, e.target);
-                                // Remove from 'watched' page
-                                removeMovieCardFromDOM(e.target);
-                            });
-                        });   
-                    }
-                    // Display modal to rate a movie
-                    const ratingModal = document.getElementById(config.CSS.sectionIDs.modal);
-                    const openRatingModalBtns = sectionWatched.querySelectorAll(config.CSS.buttonsSelectors.rateActions);
-                    let rating, movieID, newRating;
-                    if (openRatingModalBtns) {
-                        openRatingModalBtns.forEach(button => {
-                            button.addEventListener('click', (e) => {
-                                // Get movie details from button
-                                let title = e.target.getAttribute('data-title');
-                                rating = e.target.getAttribute('data-rating');
-                                movieID = e.target.getAttribute('data-id');
-                                // Change modal header according to movie title
-                                let modalTitle = ratingModal.querySelector('.rating_modal-title');
-                                modalTitle.textContent = `Rate "${title}"`;
-                                // Get rating stars
-                                const stars = [...ratingModal.querySelector('.rating_modal-rate').children];
-                                // Color stars according to current user's rating of a movie
-                                colorUserRating(stars, rating);
-                                // Prevent page from scrolling with modal open
-                                document.body.classList.add('modal-open');
-                                // Show modal
-                                helper.show(ratingModal.closest(`div.${config.CSS.containerClasses.modal}`));
-                                // Color rating stars as user hovers mouse over and keep track of chosen rating
-                                stars.forEach(star => {
-                                    star.addEventListener('mouseover', (e) => {
-                                        newRating = colorChosenStars(e.target);
-                                    });
-                                });
-                            });
-                        });
-                    }
-                    // Save rating
-                    const saveRatingBtn = ratingModal.querySelector(config.CSS.buttonsSelectors.saveRating);
-                    if (saveRatingBtn) {
-                        saveRatingBtn.addEventListener('click', (e) => {
-                            // Save rating to database
-                            saveRating(newRating, movieID);
-                            setTimeout(() => {
-                                // Enable page scrolling
-                                document.body.classList.remove('modal-open');
-                                // Hide modal
-                                helper.hide(ratingModal.closest(`div.${config.CSS.containerClasses.modal}`));
-                                // Change rating on a page
-                                watchedContainer.querySelector(`span.rating[data-id="${movieID}"]`).innerHTML = `
-                                    Rating: ${config.HTMLSymbols.star.repeat(parseInt(newRating))}
-                                `;
-                            }, 1000);
-                        });
-                    }
-                    // Close modal on click of a cancel button
-                    const closeModalBtn = ratingModal.querySelector(config.CSS.buttonsSelectors.closeModal);
-                    if (closeModalBtn) {
-                        closeModalBtn.addEventListener('click', (e) => {
-                            // Enable page scrolling
-                            document.body.classList.remove('modal-open');
-                            // Hide modal
-                            helper.hide(ratingModal.closest(`div.${config.CSS.containerClasses.modal}`));
-                        });
-                    }
-                });
+    // Profile section
+    if (sectionUser) {
+        sectionUser.addEventListener('click', (e) => {
+            // Open Watchlist
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.profile) === config.CSS.buttonsAttrValues.profileWatchlist) {
+                // Getting watchlist from server (only if it hasn't been rendered before)
+                if (watchlistContainer.childElementCount === 0) {
+                    helper.getResource(config.urlPaths.watchlist)
+                    .then(data => {
+                        renderMovieCards(data, config.userLists.watchlist, watchlistContainer);
+                    });
+                }
+                // Show watchlist and hide other section
+                helper.show(sectionWatchlist);
+                helper.hide(sectionWatched);
             }
-            // Show watched and hide other section
-            helper.show(sectionWatched);
-            helper.hide(sectionWatchlist);
+
+            // Open Watched
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.profile) === config.CSS.buttonsAttrValues.profileWatched) {
+                // Getting watched list from server (only if it hasn't been rendered before)
+                if (watchedContainer.childElementCount === 0) {
+                    helper.getResource(config.urlPaths.watched)
+                    .then(data => {
+                        renderMovieCards(data, config.userLists.watched, watchedContainer);
+                    });
+                }
+                // Show watched and hide other section
+                helper.show(sectionWatched);
+                helper.hide(sectionWatchlist);
+            }
         });
     }
-    
+
+
+    // Watchlist section
+    if (sectionUser) {
+        watchlistContainer.addEventListener('click', (e) => {
+            // 'Remove from watchlist' buttons handler
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.action) === config.CSS.buttonsAttrValues.actionWatchlist) {
+                // Remove from watchlist database
+                removeFromUserList(config.userLists.watchlist, e.target);
+                // Remove from watchlist's page
+                removeMovieCardFromDOM(e.target);
+            }
+            // 'Mark as Watched' buttons handler
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.action) === config.CSS.buttonsAttrValues.actionWatched) {
+                addToUserList(config.userLists.watched, e.target);
+            }
+        });
+    }
+
+
+    // Watched section
+    if (sectionUser) {
+        // Variables necessary for this section
+        let rating, movieID, newRating;
+        const stars = [...ratingModal.querySelector('.rating_modal-rate').children];
+
+        watchedContainer.addEventListener('click', (e) => {
+            // 'Mark as Not Watched' buttons handler
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.action) === config.CSS.buttonsAttrValues.actionWatched) {
+                // Mark as not watched in the database
+                removeFromUserList(config.userLists.watched, e.target);
+                // Remove from 'watched' page
+                removeMovieCardFromDOM(e.target);
+            }
+            // Rating buttons handler (open modal to rate a movie)
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.action) === config.CSS.buttonsAttrValues.actionRate) {
+                // Get movie details from button
+                let title = e.target.getAttribute('data-title');
+                rating = e.target.getAttribute('data-rating');
+                movieID = e.target.getAttribute('data-id');
+                // Change modal header according to movie title
+                let modalTitle = ratingModal.querySelector('.rating_modal-title');
+                modalTitle.textContent = `Rate "${title}"`;
+                // Color stars according to current user's rating of a movie
+                colorUserRating(stars, rating);
+                // Prevent page from scrolling with modal open
+                document.body.classList.add('modal-open');
+                // Show modal
+                helper.show(ratingModal.closest(`div.${config.CSS.containerClasses.modal}`));
+            }
+        });
+
+        ratingModal.addEventListener('click', (e) => {
+            // 'Save rating' button handler
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.modal) === config.CSS.buttonsAttrValues.modalSave) {
+                // Save rating to database
+                saveRating(newRating, movieID);
+                setTimeout(() => {
+                    // Enable page scrolling
+                    document.body.classList.remove('modal-open');
+                    // Hide modal
+                    helper.hide(ratingModal.closest(`div.${config.CSS.containerClasses.modal}`));
+                    // Change rating on a page
+                    watchedContainer.querySelector(`span.rating[data-id="${movieID}"]`).innerHTML = `
+                        Rating: ${config.HTMLSymbols.star.repeat(parseInt(newRating))}
+                    `;
+                }, 1000);
+            }
+            // 'Cancel' button handler
+            if (e.target.getAttribute(config.CSS.buttonsAttributes.modal) === config.CSS.buttonsAttrValues.modalClose) {
+                // Enable page scrolling
+                document.body.classList.remove('modal-open');
+                // Hide modal
+                helper.hide(ratingModal.closest(`div.${config.CSS.containerClasses.modal}`));
+            }
+        });
+
+        ratingModal.addEventListener('mouseover', (e) => {
+            if (e.target.hasAttribute(config.CSS.buttonsAttributes.starRating)) {
+                // Color rating stars as user hovers mouse over and keep track of chosen rating
+                newRating = colorChosenStars(e.target);
+            }
+        });
+    }
+
 });
 /*
 End of dynamic page scripts
@@ -828,7 +758,6 @@ function colorChosenStars(currentStar) {
     }
     return currentStar.getAttribute('data-rating');
 }
-
 
 /*
 End of functions
