@@ -1,5 +1,6 @@
 import json
 from django import urls
+from django.http.response import Http404
 import requests
 import random
 from django.contrib.auth import authenticate, login, logout
@@ -13,7 +14,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
 from django.views import generic
 from django.db.models import Count
-from django.core.paginator import Paginator
+from django.core.paginator import EmptyPage, Paginator
 from django.db import IntegrityError
 from django.db.models import Exists, OuterRef
 from requests import status_codes
@@ -278,23 +279,36 @@ def add_to_watchlist(request):
 
 
 @login_required
-def get_watchlist(request):
+def get_watchlist(request, page_number):
     # Ensure request is AJAX
     if request.is_ajax():
-        watchlist_to_render = []
         try:
-            watchlist = UserActions.objects.filter(user=request.user, watchlist=True)
-            for obj in watchlist:
-                item = obj.movie
-                watchlist_to_render.append(item.serialize())
-
-            if len(watchlist_to_render) > 0:
-                return JsonResponse(watchlist_to_render, safe=False)
-            else: 
-                return JsonResponse({'empty': 'Watchlist is empty'})
-
+            watchlist = UserActions.objects.filter(user=request.user, watchlist=True).order_by("movie")
         except UserActions.DoesNotExist:
             return JsonResponse({'empty': 'Watchlist is empty'})
+
+        watchlist_to_render = []
+        p = Paginator(watchlist, 4)
+
+        if int(page_number) > p.num_pages:
+            raise Http404
+        else:
+            page = p.page(page_number)
+
+        objects_on_page = page.object_list
+        for obj in objects_on_page:
+            # Adding all movie details from MovieDB model to an item
+            item = obj.movie
+            watchlist_to_render.append(item.serialize())
+
+        if len(watchlist_to_render) > 0:
+            return JsonResponse(watchlist_to_render, safe=False)
+        else: 
+            return JsonResponse({'empty': 'Watchlist is empty'})
+
+    # In case request was not AJAX
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
 
 
 @login_required
@@ -325,23 +339,37 @@ def remove_from_watchlist(request):
 
 
 @login_required
-def get_watched(request):
+def get_watched(request, page_number):
     # Ensure request is AJAX
     if request.is_ajax():
-        watched_to_render = []
         try:
-            watched = UserActions.objects.filter(user=request.user, watched=True)
-            for obj in watched:
-                item = obj.movie
-                watched_to_render.append(item.serialize())
-
-            if len(watched_to_render) > 0:
-                return JsonResponse(watched_to_render, safe=False)
-            else:
-                return JsonResponse({'empty': 'List of watched is empty'})
-        
+            watched = UserActions.objects.filter(user=request.user, watched=True).order_by("movie")
         except UserActions.DoesNotExist:
             return JsonResponse({'empty': 'List of watched is empty'})
+
+        watched_to_render = []
+        p = Paginator(watched, 4)
+
+        if int(page_number) > p.num_pages:
+            raise Http404
+        else:
+            page = p.page(page_number)
+
+        objects_on_page = page.object_list
+        # Adding all movie details from MovieDB model to an item
+        for obj in objects_on_page:
+            item = obj.movie
+            watched_to_render.append(item.serialize())
+
+        if len(watched_to_render) > 0:
+            return JsonResponse(watched_to_render, safe=False)
+        else:
+            return JsonResponse({'empty': 'List of watched is empty'})
+    
+    # In case request was not AJAX
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
 
 
 def mark_as_watched(request):

@@ -203,10 +203,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Getting random movie from requested category
                 helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.randomType}`)
                 .then(data => {
-                    if (userChoices.randomType === 'top-shows') {
-                        renderResult(data, data.crew, resultContainer);
+                    if (userChoices.randomType === 'trend') {
+                        renderResult(data, data.stars, resultContainer);
                     } else {
-                    renderResult(data, data.stars, resultContainer);
+                    renderResult(data, data.crew, resultContainer);
                     }
                 });
             }
@@ -280,10 +280,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     // If user chose "random buttons" in start section
                     helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.randomType}`)
                     .then(data => {
-                        if (userChoices.randomType === "top-shows") {
-                            renderResult(data, data.crew, resultContainer);
+                        if (userChoices.randomType === "trend") {
+                            renderResult(data, data.stars, resultContainer);
                         } else {
-                        renderResult(data, data.stars, resultContainer);
+                        renderResult(data, data.crew, resultContainer);
                         }
                     });
                 } else {
@@ -302,13 +302,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Profile section
     if (sectionUser) {
+        // Variables necessary for this section
+        let page_counter_watchlist = 1;
+        let page_counter_watched = 1;
+        let watchlistEnded = false;
+        let watchedEnded = false;
+
         sectionUser.addEventListener('click', (e) => {
             // Open Watchlist
             if (e.target.getAttribute(config.CSS.buttonsAttributes.profile) === config.CSS.buttonsAttrValues.profileWatchlist) {
                 // Getting watchlist from server (only if it hasn't been rendered before)
                 if (watchlistContainer.childElementCount === 0) {
-                    helper.getResource(config.urlPaths.watchlist)
+                    helper.getResource(`${config.urlPaths.watchlist}/${page_counter_watchlist}`)
                     .then(data => {
+                        page_counter_watchlist++;
                         renderMovieCards(data, config.userLists.watchlist, watchlistContainer);
                     });
                 }
@@ -321,14 +328,57 @@ document.addEventListener('DOMContentLoaded', () => {
             if (e.target.getAttribute(config.CSS.buttonsAttributes.profile) === config.CSS.buttonsAttrValues.profileWatched) {
                 // Getting watched list from server (only if it hasn't been rendered before)
                 if (watchedContainer.childElementCount === 0) {
-                    helper.getResource(config.urlPaths.watched)
+                    helper.getResource(`${config.urlPaths.watched}/${page_counter_watched}`)
                     .then(data => {
+                        page_counter_watched++;
                         renderMovieCards(data, config.userLists.watched, watchedContainer);
+                        
                     });
                 }
                 // Show watched and hide other section
                 helper.show(sectionWatched);
                 helper.hide(sectionWatchlist);
+            }
+        });
+
+        // Infinite scroll for watchlist and watched
+        window.addEventListener('scroll', function(e) {
+            // While server returns objects from watchlist and user scrolls to the end of a page
+            if (!watchlistEnded && (window.pageYOffset + window.innerHeight) === sectionUser.scrollHeight) {
+                // And watchlist is visible
+                if (e.target.getElementById(config.CSS.sectionIDs.watchlist).classList.contains('show')) {
+                    setTimeout(function() {
+                        // Get more movie cards
+                        helper.getResource(`${config.urlPaths.watchlist}/${page_counter_watchlist}`)
+                        .then(data => {
+                            // and update page counter
+                            page_counter_watchlist++;
+                            // Render them
+                            renderMovieCards(data, config.userLists.watchlist, watchlistContainer);
+                        })
+                        // Server returns 404 - watchlist has ended
+                        .catch(error => {watchlistEnded = true;});
+                    }, 2000);
+                }
+            }
+
+            // While server returns objects from watched list and user scrolls to the end of a page
+            if (!watchedEnded && (window.pageYOffset + window.innerHeight) === sectionUser.scrollHeight) {
+                // And watched list is visible
+                if (e.target.getElementById(config.CSS.sectionIDs.watched).classList.contains('show')) {
+                    setTimeout(function() {
+                        // Get more movie cards
+                        helper.getResource(`${config.urlPaths.watched}/${page_counter_watched}`)
+                        .then(data => {
+                            // and update page counter
+                            page_counter_watched++;
+                            // Render them
+                            renderMovieCards(data, config.userLists.watched, watchedContainer);
+                        })
+                        // Server returns 404 - watched list has ended
+                        .catch(error => {watchedEnded = true;});
+                    }, 2000);
+                }
             }
         });
     }
@@ -346,7 +396,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
             // 'Mark as Watched' buttons handler
             if (e.target.getAttribute(config.CSS.buttonsAttributes.action) === config.CSS.buttonsAttrValues.actionWatched) {
+                // Mark as watched in database
                 addToUserList(config.userLists.watched, e.target);
+                // Remove from watchlist's page
+                removeMovieCardFromDOM(e.target);
             }
         });
     }

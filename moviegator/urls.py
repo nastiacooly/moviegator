@@ -13,10 +13,10 @@ urlpatterns = [
     path('get_data/<parameter>', views.get_data),
     path('get_data/<type>/<genre>', views.get_data_by_genre),
     path('add_to_watchlist', views.add_to_watchlist),
-    path('get_watchlist', views.get_watchlist),
+    path('get_watchlist/<page_number>', views.get_watchlist),
     path('remove_from_watchlist', views.remove_from_watchlist),
     path('mark_as_watched', views.mark_as_watched),
-    path('get_watched', views.get_watched),
+    path('get_watched/<page_number>', views.get_watched),
     path('mark_as_not_watched', views.mark_as_not_watched),
     path('save_rating', views.save_rating)
 ]

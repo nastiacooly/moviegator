@@ -11,7 +11,7 @@
     {% if user.is_authenticated %}
 
         <!--Modal to rate movie -->
-        <div style="display: none;" class="modal-container">
+        <div class="modal-container hide">
             <div class="overlay">
                 <div class="d-flex flex-column justify-content-around px-5 py-5" id="ratingModal">
                     <div class="rating_modal-title">Rate this movie</div>
@@ -57,7 +57,7 @@
             </div>
 
             <!--Section with user's watchlist -->
-            <section style="display: none;" class="inner-section" id='section-watchlist'>
+            <section class="inner-section hide" id='section-watchlist'>
                 <div class="container text-center d-flex flex-column justify-content-between">
                     <div class="px-5">
 
@@ -73,7 +73,7 @@
             </section>
 
             <!--Section with user's watched movies/shows -->
-            <section style="display: none;" class="inner-section" id='section-watched'>
+            <section class="inner-section hide" id='section-watched'>
                 <div class="container text-center d-flex flex-column justify-content-between">
                     <div class="px-5">
 

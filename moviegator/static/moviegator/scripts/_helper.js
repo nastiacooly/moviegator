@@ -32,11 +32,13 @@ Helper functions
 
 // Functions for hiding/showing elements
 export function hide(element) {
-    element.style.display = 'none';
+    element.classList.add("hide");
+    element.classList.remove("show");
 }
 
 export function show(element) {
-    element.style.display = 'block';
+    element.classList.remove("hide");
+    element.classList.add("show");
 }
 
 export function hideWithAnimation(element, animationName) {

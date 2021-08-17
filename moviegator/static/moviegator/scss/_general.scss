@@ -6,6 +6,14 @@ body {
     overflow-x: hidden;
 }
 
+.hide {
+    display: none;
+}
+
+.show {
+    display: block;
+}
+
 .spinner {
     display: block;
     padding-top: 10px;
