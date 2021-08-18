@@ -348,17 +348,22 @@ document.addEventListener('DOMContentLoaded', () => {
                 // And watchlist is visible
                 if (e.target.getElementById(config.CSS.sectionIDs.watchlist).classList.contains('show')) {
                     setTimeout(function() {
-                        // Get more movie cards
+                        // Try to get more movie cards
                         helper.getResource(`${config.urlPaths.watchlist}/${page_counter_watchlist}`)
                         .then(data => {
-                            // and update page counter
+                            // Render spinner to display loading process for user
+                            spinner = helper.renderSpinner(watchlistContainer);
+                            // update page counter
                             page_counter_watchlist++;
-                            // Render them
-                            renderMovieCards(data, config.userLists.watchlist, watchlistContainer);
+                            // And after 2s remove spinner and render additional movie cards
+                            setTimeout(function() {
+                                spinner.remove();
+                                renderMovieCards(data, config.userLists.watchlist, watchlistContainer);
+                            }, 2000);
                         })
                         // Server returns 404 - watchlist has ended
                         .catch(error => {watchlistEnded = true;});
-                    }, 2000);
+                    }, 1000);
                 }
             }
 
@@ -367,13 +372,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 // And watched list is visible
                 if (e.target.getElementById(config.CSS.sectionIDs.watched).classList.contains('show')) {
                     setTimeout(function() {
-                        // Get more movie cards
+                        // Try to get more movie cards
                         helper.getResource(`${config.urlPaths.watched}/${page_counter_watched}`)
                         .then(data => {
-                            // and update page counter
+                            // Render spinner to display loading process for user
+                            spinner = helper.renderSpinner(watchedContainer);
+                            // update page counter
                             page_counter_watched++;
-                            // Render them
-                            renderMovieCards(data, config.userLists.watched, watchedContainer);
+                            // And after 2s remove spinner and render additional movie cards
+                            setTimeout(function() {
+                                spinner.remove();
+                                renderMovieCards(data, config.userLists.watched, watchedContainer);
+                            }, 2000);
                         })
                         // Server returns 404 - watched list has ended
                         .catch(error => {watchedEnded = true;});
