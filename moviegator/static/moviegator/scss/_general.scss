@@ -1,4 +1,8 @@
 /* General styles */
+* {
+    scroll-behavior: smooth;
+}
+
 body {
     position: relative;
     color: white;
@@ -44,6 +48,18 @@ body {
     text-transform: uppercase;
     transition: 0.5s all;
     font-size: 1.5rem;
+    font-weight: 500;
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.scroll-arrow {
+    position: fixed;
+    z-index: 6;
+    bottom: 0.5rem;
+    right: 1rem;
+    font-size: 2rem;
     font-weight: 500;
     &:hover {
         cursor: pointer;

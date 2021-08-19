@@ -307,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
         let page_counter_watched = 1;
         let watchlistEnded = false;
         let watchedEnded = false;
+        const scrollArrow = sectionUser.querySelector('.scroll-arrow');
 
         sectionUser.addEventListener('click', (e) => {
             // Open Watchlist
@@ -339,12 +340,21 @@ document.addEventListener('DOMContentLoaded', () => {
                 helper.show(sectionWatched);
                 helper.hide(sectionWatchlist);
             }
+
+            // Scroll to top on click of an arrow
+            if (e.target === scrollArrow) {
+                window.scrollTo({
+                    top: 0, 
+                    behaviour: "smooth"
+                });
+                helper.hide(scrollArrow);
+            }
         });
 
         // Infinite scroll for watchlist and watched
         window.addEventListener('scroll', function(e) {
             // While server returns objects from watchlist and user scrolls to the end of a page
-            if (!watchlistEnded && (window.pageYOffset + window.innerHeight) === sectionUser.scrollHeight) {
+            if (!watchlistEnded && (window.pageYOffset + window.innerHeight) >= sectionUser.scrollHeight) {
                 // And watchlist is visible
                 if (e.target.getElementById(config.CSS.sectionIDs.watchlist).classList.contains('show')) {
                     setTimeout(function() {
@@ -368,7 +378,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             // While server returns objects from watched list and user scrolls to the end of a page
-            if (!watchedEnded && (window.pageYOffset + window.innerHeight) === sectionUser.scrollHeight) {
+            if (!watchedEnded && (window.pageYOffset + window.innerHeight) >= sectionUser.scrollHeight) {
                 // And watched list is visible
                 if (e.target.getElementById(config.CSS.sectionIDs.watched).classList.contains('show')) {
                     setTimeout(function() {
@@ -389,6 +399,13 @@ document.addEventListener('DOMContentLoaded', () => {
                         .catch(error => {watchedEnded = true;});
                     }, 2000);
                 }
+            }
+
+            // Show arrow for scrolling back to top
+            if (window.pageYOffset >= (window.innerHeight * 0.5)) {
+                helper.show(scrollArrow);
+            } else {
+                helper.hide(scrollArrow);
             }
         });
     }
