@@ -1,0 +1,43 @@
+{% extends "moviegator/layout.html" %}
+{% load static %}
+
+{% block title %}Moviegator: Trailers{% endblock %}
+
+{% block body %}
+
+    <div id="message">{{ message }}</div>
+
+    <span class="menu-arrow" data-slide="down">menu &#8595;</span>
+
+    <!--Section with input form -->
+    <div style="text-center" id='section-trailers'>
+        <div class="container text-center">
+            <div class="px-5">
+
+                <h3>Search for trailer to watch</h3>
+
+                <form method="get" class="d-flex flex-column justify-content-between align-items-center trailer-form">
+                    <input autofocus required placeholder="Movie or TV Show Title (optional: with year), ex. 'Inception 2010'" type="text" class="trailer-input mt-3">
+                    <button class="btn btn-outline-danger btn-lg mt-3" type="submit">Search</button>
+                </form>
+
+                <div class="mt-4 hide">
+                    <h4>
+                        <span>Do you mean any of these titles?</span><br>
+                        <span>Please click on any item to watch the trailer.</span>
+                    </h4>
+                    <div class="suggestions-container d-flex flex-row flex-wrap justify-content-around">
+                        
+                    </div>
+                </div>
+
+                <div class="trailer-container px-5">
+                    
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+{% endblock %}

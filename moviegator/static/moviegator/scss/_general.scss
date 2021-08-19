@@ -118,12 +118,8 @@ section {
         &-login, &-register, &-start, &-mood-genre {
             background: $linear-bg-light;
         }
-        &-welcome, &-mood, &-genre, &-result, &-ratings {
+        &-welcome, &-mood, &-genre, &-result {
             background: $linear-bg-dark;
-        }
-        &-ratings {
-            z-index: 5;
-            padding-top: 5rem;
         }
         &-login, &-register, &-welcome {
             z-index: 5;
@@ -153,9 +149,8 @@ section {
 }
 
 div {
-    &#section-user {
+    &#section-user, &#section-trailers {
         position: absolute;
-        background: black;
         top: 0;
         padding-top: 5rem;
         padding-bottom: 5rem;
@@ -166,6 +161,12 @@ div {
             max-width: 210px !important;
             height: 80px !important;
         }
+    }
+    &#section-user {
+        background: black;
+    }
+    &#section-trailers {
+        background: $linear-bg-dark;
     }
 }
 
@@ -226,6 +227,21 @@ div {
 
 .rating {
     color: rgb(255, 208, 0);
+}
+
+.trailer-input {
+    width: 70%;
+    height: 3rem;
+    padding: 1rem;
+}
+
+.suggestion-item {
+    transition: 0.5s all;
+    &:hover {
+        cursor: pointer;
+        transform: scale(1.1);
+        box-shadow: 12px 12px 5px 2px rgba(0, 0, 0, .3);
+    }
 }
 
 

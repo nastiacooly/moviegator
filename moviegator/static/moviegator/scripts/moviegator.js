@@ -28,14 +28,17 @@ const config = {
             profile: 'section-user',
             watchlist: 'section-watchlist',
             watched: 'section-watched',
-            modal: 'ratingModal'
+            modal: 'ratingModal',
+            trailers: 'section-trailers'
         },
         containerClasses: {
             watchlist: 'watchlist-container',
             watched: 'watched-container',
             result: 'result-container',
             modal: 'modal-container',
-            choices: 'choices-container'
+            choices: 'choices-container',
+            trailer: 'trailer-container',
+            suggestions: 'suggestions-container'
         },
         buttonsAttributes: {
             action: 'data-action',
@@ -101,11 +104,15 @@ const config = {
         getMovieData: '/get_data',
         markAsWatched: '/mark_as_watched',
         markAsNotWatched: '/mark_as_not_watched',
-        saveRating: '/save_rating'
+        saveRating: '/save_rating',
+        searchTitle: '/search_title'
     },
     userLists: {
         watchlist: 'watchlist',
         watched: 'watched'
+    },
+    messages: {
+        wrongTrailerInput: 'Your search request should be at least 2 characters long'
     }
 };
 /*
@@ -131,7 +138,9 @@ document.addEventListener('DOMContentLoaded', () => {
         sectionWatched = document.querySelector(`#${config.CSS.sectionIDs.watched}`),
         watchlistContainer = document.querySelector(`.${config.CSS.containerClasses.watchlist}`),
         watchedContainer = document.querySelector(`.${config.CSS.containerClasses.watched}`),
-        ratingModal = document.getElementById(config.CSS.sectionIDs.modal);
+        ratingModal = document.getElementById(config.CSS.sectionIDs.modal),
+        sectionTrailers = document.querySelector(`#${config.CSS.sectionIDs.trailers}`),
+        suggestionsContainer = document.querySelector(`.${config.CSS.containerClasses.suggestions}`);
 
 
     // Navbar hide/show
@@ -497,6 +506,54 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+
+    // Section with trailers
+    if (sectionTrailers) {
+        // Submitting trailer search form
+        const trailerForm = sectionTrailers.querySelector('.trailer-form');
+        const input = trailerForm.querySelector('.trailer-input');
+        trailerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            // Clear suggestions container of previous suggestions if any
+            helper.removeChildrenElements(suggestionsContainer);
+            if (input.value.trim().length < 2) {
+                // Ensure search request at least two characters long
+                helper.renderMessageAlert(config.messages.wrongTrailerInput, config.CSS.bootstrapAlertTypes.danger);
+                setTimeout(function() {
+                    helper.removeMessageAlert();
+                }, 4000);
+            } else {
+                // Get rid of whitespace in input
+                let title = input.value.trim();
+                // Show suggestions section
+                helper.show(suggestionsContainer.parentElement);
+                spinner = helper.renderSpinner(suggestionsContainer);
+                // Get movies/shows with such title
+                helper.getResource(`${config.urlPaths.searchTitle}/${title}`)
+                .then(data => {
+                    if (data.error) {
+                        // Render error alert if any
+                        helper.renderMessageAlert(data.error, config.CSS.bootstrapAlertTypes.danger);
+                    } else {
+                        // Removing any previous error messages
+                        helper.removeMessageAlert();
+                        // Remove spinner
+                        spinner.remove();
+                        // Render suggestions
+                        data.forEach(item => {
+                            let itemCard = new SuggestionCard(item.image, 'poster', item.title, item.description, item.id, suggestionsContainer);
+                            itemCard.render();
+                        });
+                    }
+                })
+                .finally(() => {
+                    // Clear form
+                    trailerForm.reset();
+                });
+            }
+        });
+    }
+
 });
 /*
 End of dynamic page scripts
@@ -576,6 +633,48 @@ class MovieCard {
             `;
         
         this.parent.append(movieCardElement); // adding to DOM
+    }
+}
+/*
+End of class
+*/
+
+/* Class for suggestion items (search trailer results) */
+class SuggestionCard {
+    constructor(src, alt, title, year, id, parentElement, ...classes) {
+        this.src = src;
+        this.alt = alt;
+        this.title = title;
+        this.year = year;
+        this.id = id;
+        this.classes = classes;
+        this.parent = parentElement;
+    }
+
+    render() {
+        const suggestionElement = document.createElement('div');
+
+        if (this.classes.length === 0) {
+            this.classes = [config.CSS.bootstrapCardClasses.card, 'text-center', 'text-white', 'mt-5', 'suggestion-item'];
+            this.classes.forEach(className => suggestionElement.classList.add(className)); 
+            //adding default classes to the element in case they were not specified
+        } else {
+            this.classes.forEach(className => suggestionElement.classList.add(className)); 
+            //adding specified classes to the element
+        }
+
+        suggestionElement.innerHTML = `
+            <img src=${this.src} class="card-img-top" alt=${this.alt}>
+            <div class="card-body">
+                <h5 class="card-title">${this.title}</h5>
+                <h6 class="card-subtitle mb-2">${this.year}</h6>
+            </div>
+        `;
+
+        suggestionElement.setAttribute('data-id', `${this.id}`);
+        suggestionElement.setAttribute('data-action', 'trailer');
+        
+        this.parent.append(suggestionElement); // adding to DOM
     }
 }
 /*

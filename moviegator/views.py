@@ -66,6 +66,7 @@ top250_shows = 'Top250TVs/'
 list_by_genre = 'IMDbList/'
 in_theatres = 'InTheaters/'
 title_details = 'Title/'
+title_search = 'SearchTitle/'
 
 
 @ensure_csrf_cookie
@@ -125,6 +126,7 @@ def register(request):
         return render(request, "moviegator/register.html")
 
 
+@ensure_csrf_cookie
 def profile_view(request):
     """
     Renders profile page of signed in user
@@ -140,11 +142,11 @@ def profile_view(request):
 
 
 @login_required
-def ratings_view(request):
+def trailers_view(request):
     """
-    Renders page with movies/shows rated by all users of the app
+    Renders page where user can search for and watch movie trailers
     """
-    return render(request, "moviegator/ratings.html")
+    return render(request, "moviegator/trailers.html")
 
 
 def get_data(request, parameter):
@@ -472,6 +474,30 @@ def save_rating(request):
             return JsonResponse({'error': 'Sorry, something went wrong'})
     
     # In case request was GET or not AJAX
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+def search_title(request, title):
+    # Ensure request is made by Javascript (fetch)
+    if request.is_ajax():
+        # API call for search results
+        r = requests.get(API_URL+title_search+API_KEY+'/'+title)
+
+        # Request to API was successful
+        if r.status_code == 200:
+            result = r.json()
+            # Get three first results
+            result_items = result["results"][0:3]
+            result_to_render = []
+            for obj in result_items:
+                result_to_render.append(obj)
+            return JsonResponse(result_to_render, safe=False)
+
+        # Request to API failed
+        else:
+            return JsonResponse({"error": "Sorry, something went wrong. Please, try again."})
+    # Show error, if page was not requested by AJAX
     else:
         return HttpResponseNotFound('<h1>Page not found</h1>')
 

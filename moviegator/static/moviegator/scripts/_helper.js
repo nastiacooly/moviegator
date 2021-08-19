@@ -97,6 +97,16 @@ export function renderSpinner(parent) {
 }
 
 
+// Function to remove all children elements of a parent element
+export function removeChildrenElements(parent) {
+    let firstChild = parent.firstElementChild;
+    while(firstChild) {
+        firstChild.remove();
+        firstChild = parent.firstElementChild;
+    }
+}
+
+
 // Function to make GET-requests which returns JSON-data
 export const getResource = async (url) => {
     const result = await fetch(url, {
