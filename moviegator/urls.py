@@ -19,5 +19,6 @@ urlpatterns = [
     path('get_watched/<page_number>', views.get_watched),
     path('mark_as_not_watched', views.mark_as_not_watched),
     path('save_rating', views.save_rating),
-    path('search_title/<title>', views.search_title)
+    path('search_title/<title>', views.search_title),
+    path('get_trailer/<movie_id>', views.get_trailer)
 ]

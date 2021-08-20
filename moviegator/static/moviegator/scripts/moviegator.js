@@ -61,7 +61,8 @@ const config = {
             profileWatchlist: 'watchlist',
             profileWatched: 'watched',
             modalClose: 'close',
-            modalSave: 'save'
+            modalSave: 'save',
+            actionTrailer: 'trailer'
         },
         animationNames: {
             slideToTop: 'slideToTop',
@@ -105,14 +106,19 @@ const config = {
         markAsWatched: '/mark_as_watched',
         markAsNotWatched: '/mark_as_not_watched',
         saveRating: '/save_rating',
-        searchTitle: '/search_title'
+        searchTitle: '/search_title',
+        getTrailer: '/get_trailer'
     },
     userLists: {
         watchlist: 'watchlist',
         watched: 'watched'
     },
     messages: {
-        wrongTrailerInput: 'Your search request should be at least 2 characters long'
+        wrongTrailerInput: 'Your search request should be at least 2 characters long',
+        noTrailerFound: 'Sorry, we could not find any YouTube trailer for this title'
+    },
+    outerURLs: {
+        embedVideo: 'https://www.youtube.com/embed'
     }
 };
 /*
@@ -140,7 +146,8 @@ document.addEventListener('DOMContentLoaded', () => {
         watchedContainer = document.querySelector(`.${config.CSS.containerClasses.watched}`),
         ratingModal = document.getElementById(config.CSS.sectionIDs.modal),
         sectionTrailers = document.querySelector(`#${config.CSS.sectionIDs.trailers}`),
-        suggestionsContainer = document.querySelector(`.${config.CSS.containerClasses.suggestions}`);
+        suggestionsContainer = document.querySelector(`.${config.CSS.containerClasses.suggestions}`),
+        trailerContainer = document.querySelector(`.${config.CSS.containerClasses.trailer}`);
 
 
     // Navbar hide/show
@@ -514,17 +521,19 @@ document.addEventListener('DOMContentLoaded', () => {
         const input = trailerForm.querySelector('.trailer-input');
         trailerForm.addEventListener('submit', (e) => {
             e.preventDefault();
+            // Get rid of whitespace in input
+            let title = input.value.trim();
             // Clear suggestions container of previous suggestions if any
             helper.removeChildrenElements(suggestionsContainer);
-            if (input.value.trim().length < 2) {
+            // Hide trailer container (in case it was shown before)
+            helper.hide(trailerContainer);
+            if (title.length < 2) {
                 // Ensure search request at least two characters long
                 helper.renderMessageAlert(config.messages.wrongTrailerInput, config.CSS.bootstrapAlertTypes.danger);
                 setTimeout(function() {
                     helper.removeMessageAlert();
                 }, 4000);
             } else {
-                // Get rid of whitespace in input
-                let title = input.value.trim();
                 // Show suggestions section
                 helper.show(suggestionsContainer.parentElement);
                 spinner = helper.renderSpinner(suggestionsContainer);
@@ -552,8 +561,48 @@ document.addEventListener('DOMContentLoaded', () => {
                 });
             }
         });
-    }
 
+        // Clicking on suggestion card to watch trailer
+        sectionTrailers.addEventListener('click', (e) => {
+            if (e.target.parentElement.getAttribute(config.CSS.buttonsAttributes.action) === config.CSS.buttonsAttrValues.actionTrailer) {
+                // Get movie/show IMDb id
+                let movieID = e.target.parentElement.dataset.id;
+                // Clear suggestions container and hide its section
+                helper.hide(suggestionsContainer.parentElement);
+                helper.removeChildrenElements(suggestionsContainer);
+                // Clear trailer container
+                helper.removeChildrenElements(trailerContainer);
+                // Show trailer container
+                helper.show(trailerContainer);
+                // Render spinner while loading
+                spinner = helper.renderSpinner(trailerContainer);
+                // Get URL of Youtube trailer and show player
+                helper.getResource(`${config.urlPaths.getTrailer}/${movieID}`)
+                .then(data => {
+                    if (data.error) {
+                        // Render error alert if any
+                        helper.renderMessageAlert(data.error, config.CSS.bootstrapAlertTypes.danger);
+                    } else if (data.videoId) {
+                        // Removing any previous error messages
+                        helper.removeMessageAlert();
+                        // Remove spinner
+                        spinner.remove();
+                        // Get Youtube trailer id and make valid URL for embedded video
+                        let trailerID = data.videoId;
+                        let videoURL = `${config.outerURLs.embedVideo}/${trailerID}`;
+                        // Create player and render it
+                        let trailerPlayer = new TrailerPlayer(videoURL, trailerContainer);
+                        trailerPlayer.render();
+                    } else {
+                        // Removing any previous error messages
+                        helper.removeMessageAlert();
+                        // Show info that trailer was not found
+                        helper.renderInfo(config.messages.noTrailerFound, trailerContainer);
+                    }
+                });
+            }
+        });
+    }
 });
 /*
 End of dynamic page scripts
@@ -639,6 +688,7 @@ class MovieCard {
 End of class
 */
 
+
 /* Class for suggestion items (search trailer results) */
 class SuggestionCard {
     constructor(src, alt, title, year, id, parentElement, ...classes) {
@@ -675,6 +725,35 @@ class SuggestionCard {
         suggestionElement.setAttribute('data-action', 'trailer');
         
         this.parent.append(suggestionElement); // adding to DOM
+    }
+}
+/*
+End of class
+*/
+
+
+/* Class for trailer player */
+class TrailerPlayer {
+    constructor(src, parentElement, ...classes) {
+        this.src = src;
+        this.parent = parentElement;
+        this.classes = classes;
+    }
+
+    render() {
+        const trailerPlayerElement = document.createElement('iframe');
+
+        if (this.classes.length === 0) {
+            this.classes = ['trailer-player'];
+            this.classes.forEach(className => trailerPlayerElement.classList.add(className)); 
+            //adding default classes to the element in case they were not specified
+        } else {
+            this.classes.forEach(className => trailerPlayerElement.classList.add(className)); 
+            //adding specified classes to the element
+        }
+
+        trailerPlayerElement.src = this.src;
+        this.parent.append(trailerPlayerElement);
     }
 }
 /*

@@ -67,6 +67,7 @@ list_by_genre = 'IMDbList/'
 in_theatres = 'InTheaters/'
 title_details = 'Title/'
 title_search = 'SearchTitle/'
+trailer = 'YouTubeTrailer/'
 
 
 @ensure_csrf_cookie
@@ -493,6 +494,25 @@ def search_title(request, title):
             for obj in result_items:
                 result_to_render.append(obj)
             return JsonResponse(result_to_render, safe=False)
+
+        # Request to API failed
+        else:
+            return JsonResponse({"error": "Sorry, something went wrong. Please, try again."})
+    # Show error, if page was not requested by AJAX
+    else:
+        return HttpResponseNotFound('<h1>Page not found</h1>')
+
+
+def get_trailer(request, movie_id):
+    # Ensure request is made by Javascript (fetch)
+    if request.is_ajax():
+        # API call for search results
+        r = requests.get(API_URL+trailer+API_KEY+'/'+movie_id)
+
+        # Request to API was successful
+        if r.status_code == 200:
+            result = r.json()
+            return JsonResponse(result, safe=False)
 
         # Request to API failed
         else:

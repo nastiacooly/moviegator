@@ -229,10 +229,25 @@ div {
     color: rgb(255, 208, 0);
 }
 
-.trailer-input {
-    width: 70%;
-    height: 3rem;
-    padding: 1rem;
+.trailer {
+    &-container {
+        position: relative;
+        padding-bottom: 56.25%; /* 16:9 */
+        height: 0;
+    }
+    &-input {
+        width: 70%;
+        height: 3rem;
+        padding: 1rem;
+    }
+    &-player {
+        animation: appear 2s linear 0s 1 normal forwards;
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
 }
 
 .suggestion-item {
