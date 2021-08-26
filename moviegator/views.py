@@ -142,7 +142,6 @@ def profile_view(request):
         })
 
 
-@login_required
 def trailers_view(request):
     """
     Renders page where user can search for and watch movie trailers

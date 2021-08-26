@@ -8,6 +8,11 @@ body {
     color: white;
     font-family: 'Josefin Sans', sans-serif;
     overflow-x: hidden;
+    height: 100vh;
+}
+
+.content {
+    height: auto;
 }
 
 .hide {
@@ -26,15 +31,16 @@ body {
 
 .navbar {
     z-index: 7;
-    top: -10vh;
+    top: -5rem;
 }
 
-.navbar-brand, .brand {
+.navbar-brand {
     font-family: 'Bebas Neue', cursive;
     font-size: 2rem;
 }
 
 .brand {
+    font-family: 'Bebas Neue', cursive;
     color: white;
     font-size: 16rem;
     line-height: 10rem;
@@ -69,6 +75,7 @@ body {
 .card {
     background-color: rgba(0, 0, 0, 0) !important;
     border: none !important;
+    margin: 0 auto;
     &>img {
         height: 30vh !important;
         object-fit: contain !important;
@@ -106,7 +113,7 @@ section {
         position: relative;
         top: 2rem;
         height: auto;
-        width: 100vw;
+        width: 100%;
         z-index: 6;
         background-color: transparent;
         padding-bottom: 2rem;
@@ -123,10 +130,10 @@ section {
         }
         &-login, &-register, &-welcome {
             z-index: 5;
-            padding-top: 17rem;
+            padding-top: 12rem;
         }
         &-start, &-mood-genre {
-            padding-top: 20rem;
+            padding-top: 15rem;
         }
         &-start {
             z-index: 4;
@@ -136,11 +143,11 @@ section {
         }
         &-mood, &-genre {
             z-index: 2;
-            padding-top: 20rem;
+            padding-top: 15rem;
         }
         &-result {
             z-index: 1;
-            padding-top: 10rem;
+            padding-top: 7rem;
             .card {
                 animation: scale 1.5s linear 0s 1 normal forwards;
             }
@@ -154,12 +161,14 @@ div {
         top: 0;
         padding-top: 5rem;
         padding-bottom: 5rem;
-        min-height: 100vh;
-        width: 100vw;
+        min-height: 100%;
+        width: 100%;
         z-index: 5;
         .card-text {
-            max-width: 210px !important;
             height: 80px !important;
+            @media (min-width: 576px) {
+                max-width: 210px !important;
+            }
         }
     }
     &#section-user {
@@ -170,7 +179,11 @@ div {
     }
 }
 
-.watchlist-container {
+.choices-container {
+    max-width: 600px;
+}
+
+.watchlist-container, .watched-container {
     max-width: 100%;
 }
 

@@ -1,0 +1,70 @@
+/* for large screens */
+@media (min-width: 576px) {
+    div {
+        &#section-user, &#section-trailers {
+            .card-text {
+                max-width: 210px !important;
+            }
+        }
+    }
+}
+
+/* for small screens only in portrait orientation */
+@media (orientation: portrait) and (max-width: 576px) {
+    .btn {
+        font-size: 0.7rem;
+        line-height: 0.7rem;
+    }
+
+    .btn-lg {
+        font-size: 1rem;
+        line-height: 1rem;
+    }
+
+    .brand {
+        font-size: 8rem;
+        line-height: 5rem;
+    }
+
+    .menu-arrow {
+        font-size: 1rem;
+    }
+
+    .header {
+        &_big {
+            font-size: 1.5rem;
+        }
+        &_md {
+            font-size: 1.3rem;
+        }
+    }
+
+    section {
+        &#section {
+            &-login, &-register, &-welcome {
+                padding-top: 12rem;
+            }
+            &-start, &-mood-genre {
+                padding-top: 8rem;
+            }
+            &-mood, &-genre {
+                padding-top: 8rem;
+            }
+            &-result {
+                padding-top: 5rem;
+            }
+        }
+    }
+
+    .card {
+        &-title {
+            font-size: 1rem;
+        }
+        &-subtitle {
+            font-size: 0.8rem;
+        }
+        &-text {
+            font-size: 0.5rem;
+        }
+    }
+}

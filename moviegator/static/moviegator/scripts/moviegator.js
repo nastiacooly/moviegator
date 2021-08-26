@@ -632,7 +632,7 @@ class MovieCard {
         let buttons;
 
         if (this.classes.length === 0) {
-            this.classes = [config.CSS.bootstrapCardClasses.card, 'text-center', 'text-white', 'mt-5'];
+            this.classes = [config.CSS.bootstrapCardClasses.card, 'text-center', 'text-white', 'mt-3'];
             this.classes.forEach(className => movieCardElement.classList.add(className)); 
             //adding default classes to the element in case they were not specified
         } else {

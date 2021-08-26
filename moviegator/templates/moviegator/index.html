@@ -9,7 +9,7 @@
     <!--Welcome overlay section -->
     <section class="text-center" id="section-welcome">
         <h1 class="brand">Moviegator</h1>
-        <h3>Advises random movies and TV shows based on your mood or genre preference</h3>
+        <h3 class="header header_md">Advises random movies and TV shows based on your mood or genre preference</h3>
 
         {% if user.is_authenticated %}
         <button type="button" class="btn btn-outline-danger btn-lg my-3" data-action="start">Start</button>
@@ -33,14 +33,14 @@
     <section class="hide" id='section-start'>
         <div class="container text-center d-flex flex-column justify-content-between">
             <div class="px-5">
-                <h1>What Moviegator should find for you?</h1>
+                <h1 class="header header_big">What Moviegator should find for you?</h1>
 
                 <div class="d-flex flex-row justify-content-center mt-2 mb-5">
                     <button class="btn btn-outline-light btn-lg mx-2" type="button" data-type="movie">Movie</button>
                     <button class="btn btn-outline-light btn-lg mx-2" type="button" data-type="show">TV Show</button>
                 </div>
 
-                <h3>Or Moviegator can show you random movie / TV show from</h3>
+                <h3 class="header header_md">Or Moviegator can show you random movie / TV show from</h3>
 
                 <div class="d-flex flex-row justify-content-center my-2">
                     <button class="btn btn-success mx-2" type="button" data-random="top-movies">Top-250 Movies</button>
@@ -62,7 +62,7 @@
     <section class="hide" id='section-mood-genre'>
         <div class="container text-center d-flex flex-column justify-content-between">
             <div class="px-5">
-                <h1>Should Moviegator advise based<br>on your mood or your genre preference?</h1>
+                <h1 class="header header_big">Should Moviegator advise based<br>on your mood or your genre preference?</h1>
 
                 <div class="d-flex flex-row justify-content-center mt-2">
                     <button class="btn btn-outline-light btn-lg mx-2" type="button" data-base="mood">Mood</button>
@@ -83,28 +83,34 @@
     <section class="hide" id='section-mood'>
         <div class="container text-center d-flex flex-column justify-content-between">
             <div class="container choices-container">
-                <h1>How's your mood today?</h1>
+                <h1 class="header header_big">How's your mood today?</h1>
 
-                <div class="row row-cols-auto mt-3 mb-2">
-                    <div class="col">
+                <div class="row row-cols-1 row-cols-sm-3 mt-3">
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="comedy">Cheerful</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="drama">Reflective</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="action">Energetic</button>
                     </div>
-                </div>
-
-                <div class="row row-cols-auto mt-3 mb-2">
-                    <div class="col">
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="romance">Romantic</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="mystery">Mysterious</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="horror">Gloomy</button>
                     </div>
-                </div>
-
-                <div class="row row-cols-auto mt-3 mb-2">
-                    <div class="col">
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="fantasy">Dreamy</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="thriller">Spooky</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="western">Wild</button>
                     </div>
                 </div>
@@ -123,28 +129,34 @@
     <section class="hide" id='section-genre'>
         <div class="container text-center d-flex flex-column justify-content-between">
             <div class="container choices-container">
-                <h1>Which genre do you prefer today?</h1>
+                <h1 class="header header_big">Which genre do you prefer today?</h1>
 
-                <div class="row row-cols-auto mt-3 mb-2">
-                    <div class="col">
+                <div class="row row-cols-1 row-cols-sm-3 mt-3">
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="drama">Drama</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="fantasy">Fantasy</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="romance">Romance</button>
                     </div>
-                </div>
-
-                <div class="row row-cols-auto my-2">
-                    <div class="col">
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="comedy">Comedy</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="horror">Horror</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="thriller">Thriller</button>
                     </div>
-                </div>
-
-                <div class="row row-cols-auto my-2">
-                    <div class="col">
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="action">Action</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="mystery">Mystery</button>
+                    </div>
+                    <div class="col mb-2">
                         <button class="btn btn-outline-light btn-lg mx-2" type="button" data-genre="western">Western</button>
                     </div>
                 </div>
@@ -163,9 +175,9 @@
         <div class="container text-center d-flex flex-column justify-content-between">
             <div class="px-5">
 
-                <h1>Moviegator recommends you to watch...</h1>
+                <h1 class="header header_big">Moviegator recommends you to watch...</h1>
 
-                <div class="result-container px-5">
+                <div class="result-container px-2">
                     
                 </div>
 
