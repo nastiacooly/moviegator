@@ -293,9 +293,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 previousResult.remove();
                 // Fetching for another random movie and rendering its card
                 if (userChoices.randomType) {
+                    // Showing spinner while JSON loads
+                    spinner = helper.renderSpinner(resultContainer);
                     // If user chose "random buttons" in start section
                     helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.randomType}`)
                     .then(data => {
+                        spinner.remove();
                         if (userChoices.randomType === "trend") {
                             renderResult(data, data.stars, resultContainer);
                         } else {
@@ -308,6 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     // If user chose mood/genre
                     helper.getResource(`${config.urlPaths.getMovieData}/${userChoices.movieOrShow}/${userChoices.genre}`)
                     .then(data => {
+                        spinner.remove();
                         renderResult(data, data.description, resultContainer);
                     });
                 }
@@ -505,9 +509,9 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         });
 
-        ratingModal.addEventListener('mouseover', (e) => {
+        ratingModal.addEventListener('click', (e) => {
             if (e.target.hasAttribute(config.CSS.buttonsAttributes.starRating)) {
-                // Color rating stars as user hovers mouse over and keep track of chosen rating
+                // Color rating stars as user clicks on any star and keep track of chosen rating
                 newRating = colorChosenStars(e.target);
             }
         });

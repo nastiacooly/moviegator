@@ -38,14 +38,14 @@
 
             <div class="container text-center d-flex flex-column">
                 <div class="px-5">
-                    <h1>{{ user.username }}</h1>
-                    <h3>This is your profile</h3>
+                    <h1 class="header header_big">{{ user.username }}</h1>
+                    <h3 class="header header_md">This is your profile</h3>
                 </div>
 
                 <div class="d-flex flex-column my-4">
-                    <h5>Your username: {{ user.username }}</h5>
-                    <h5>Your email: {{ user.email }}</h5>
-                    <h6>Date of joining Moviegator: {{ user.date_joined }}</h6>
+                    <h5 class="header header_sm">Your username: {{ user.username }}</h5>
+                    <h5 class="header header_sm">Your email: {{ user.email }}</h5>
+                    <h6 class="header header_xs">Date of joining Moviegator: {{ user.date_joined }}</h6>
                 </div>
 
                 <div class="d-flex flex-row justify-content-center">
@@ -64,7 +64,7 @@
                 <div class="container text-center d-flex flex-column justify-content-between">
                     <div class="px-5">
 
-                        <h1>Your watchlist</h1>
+                        <h1 class="header header_big">Your watchlist</h1>
 
                         <div class="watchlist-container d-flex flex-lg-row flex-xs-column flex-wrap justify-content-around">
                             
@@ -80,7 +80,7 @@
                 <div class="container text-center d-flex flex-column justify-content-between">
                     <div class="px-5">
 
-                        <h1>You already watched these titles</h1>
+                        <h1 class="header header_big">You already watched these titles</h1>
 
                         <div class="watched-container d-flex flex-lg-row flex-xs-column flex-wrap justify-content-around">
                             
@@ -97,7 +97,7 @@
 
         <div class="text-center" id="section-user">
 
-            <h3>You should be signed in to see your profile</h3>
+            <h3 class="header header_md">You should be signed in to see your profile</h3>
 
             <div class="d-flex flex-row justify-content-center my-3">
                 <button type="button" class="btn btn-outline-dark btn-lg mx-2" data-action="login">

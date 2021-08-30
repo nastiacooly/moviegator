@@ -9,10 +9,12 @@ body {
     font-family: 'Josefin Sans', sans-serif;
     overflow-x: hidden;
     height: 100vh;
+    margin: 0;
+    padding: 0;
 }
 
 .content {
-    height: auto;
+    height: calc(100%-74px);
 }
 
 .hide {
@@ -164,12 +166,6 @@ div {
         min-height: 100%;
         width: 100%;
         z-index: 5;
-        .card-text {
-            height: 80px !important;
-            @media (min-width: 576px) {
-                max-width: 210px !important;
-            }
-        }
     }
     &#section-user {
         background: black;
@@ -271,5 +267,3 @@ div {
         box-shadow: 12px 12px 5px 2px rgba(0, 0, 0, .3);
     }
 }
-
-
