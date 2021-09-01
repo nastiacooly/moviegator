@@ -1,5 +1,6 @@
-/* for large screens only */
-@media (min-width: 768px) {
+/* for bigger screens only */
+@media screen 
+    and (min-width: 768px) {
     div {
         &#section-user, &#section-trailers {
             .card-text {
@@ -10,227 +11,259 @@
     }
 }
 
-/* for large screens */
-@media (max-width: 1199px) {
-    .btn {
-        font-size: 1rem;
-        line-height: 1rem;
-    }
-
-    .btn-lg {
-        font-size: 1.3rem;
-        line-height: 1.2rem;
-    }
-
-    .brand {
-        font-size: 10rem;
-        line-height: 7rem;
-    }
-
-    .menu-arrow {
-        font-size: 1rem;
-    }
-
-    .header {
-        &_big {
-            font-size: 1.5rem;
-        }
-        &_md {
-            font-size: 1.3rem;
-        }
-        &_sm {
-            font-size: 1.1rem;
-        }
-        &_xs {
-            font-size: 0.9rem;
-        }
-    }
-
-    .hint {
-        font-size: 0.9rem;
-    }
-
-    section {
-        &#section {
-            &-login, &-register, &-welcome {
-                padding-top: 8rem;
-            }
-            &-start, &-mood-genre {
-                padding-top: 6rem;
-            }
-            &-mood, &-genre {
-                padding-top: 5rem;
-            }
-            &-result {
-                padding-top: 5rem;
-                min-height: 100%;
-                height: fit-content;
-            }
-        }
-    }
-
-    .card {
-        &-text {
-            font-size: 1rem;
-        }
-    }
-
-    .modal-container {
-        .overlay {
-            #ratingModal {
-                font-size: 2rem;
-                width: 70%;
-                height: 40%;
-                .rating_modal-rate {
-                    font-size: 2rem;
+/* for landscape mode on mobile screens */
+@media screen 
+    and (max-device-width: 1199px) 
+    and (orientation: landscape) {
+        .modal-container {
+            .overlay {
+                #ratingModal {
+                    font-size: 1.5rem;
+                    width: 80%;
+                    height: 90%;
+                    .rating_modal-rate {
+                        font-size: 1.5rem;
+                    }
                 }
             }
         }
-    }
 
-    .trailer {
-        &-input {
-            padding: 1rem;
-            font-size: 1rem;
+        section {
+            &#section {
+                &-login, &-register, &-welcome {
+                    min-height: 100%;
+                    height: fit-content;
+                }
+            }
         }
-    }
 }
 
-/* for medium screens */
-@media (max-width: 991px) {
-    section {
-        &#section {
-            &-login, &-register, &-welcome {
-                padding-top: 6rem;
-            }
-            &-start, &-mood-genre {
-                padding-top: 6rem;
-            }
-            &-mood, &-genre {
-                padding-top: 5rem;
-            }
+/* for large and smaller screens */
+@media screen
+    and (max-width: 1199px) {
+        .btn {
+            font-size: 1rem;
+            line-height: 1rem;
         }
-    }
 
-    .trailer {
-        &-input {
-            padding: 1rem;
+        .btn-lg {
+            font-size: 1.3rem;
+            line-height: 1.2rem;
+        }
+
+        .brand {
+            font-size: 10rem;
+            line-height: 7rem;
+        }
+
+        .menu-arrow {
             font-size: 1rem;
         }
-    }
+
+        .header {
+            &_big {
+                font-size: 1.5rem;
+            }
+            &_md {
+                font-size: 1.3rem;
+            }
+            &_sm {
+                font-size: 1.1rem;
+            }
+            &_xs {
+                font-size: 0.9rem;
+            }
+        }
+
+        .hint {
+            font-size: 0.9rem;
+        }
+
+        section {
+            &#section {
+                &-login, &-register, &-welcome {
+                    padding-top: 8rem;
+                }
+                &-start, &-mood-genre {
+                    padding-top: 6rem;
+                }
+                &-mood, &-genre {
+                    padding-top: 5rem;
+                }
+                &-result {
+                    padding-top: 5rem;
+                    min-height: 100%;
+                    height: fit-content;
+                }
+            }
+        }
+
+        .card {
+            &-text {
+                font-size: 1rem;
+            }
+        }
+
+        .modal-container {
+            .overlay {
+                #ratingModal {
+                    font-size: 2rem;
+                    width: 70%;
+                    height: 40%;
+                    .rating_modal-rate {
+                        font-size: 2rem;
+                    }
+                }
+            }
+        }
+
+        .trailer {
+            &-input {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+        }
+}
+
+/* for medium and smaller screens */
+@media screen 
+    and (max-width: 991px) {
+        section {
+            &#section {
+                &-login, &-register, &-welcome {
+                    padding-top: 6rem;
+                }
+                &-start, &-mood-genre {
+                    padding-top: 6rem;
+                }
+                &-mood, &-genre {
+                    padding-top: 5rem;
+                }
+            }
+        }
+
+        .trailer {
+            &-input {
+                padding: 1rem;
+                font-size: 1rem;
+            }
+        }
 }
 
 /* for small screens */
-@media (max-width: 767px) {
-    .btn-lg {
-        font-size: 1.2rem;
-        line-height: 1.1rem;
-    }
-
-    .brand {
-        font-size: 8rem;
-        line-height: 6rem;
-    }
-
-    .header {
-        &_big {
+@media screen
+    and (max-width: 767px) {
+        .btn-lg {
             font-size: 1.2rem;
+            line-height: 1.1rem;
         }
-        &_md {
-            font-size: 0.9rem;
+
+        .brand {
+            font-size: 8rem;
+            line-height: 6rem;
         }
-        &_sm {
+
+        .header {
+            &_big {
+                font-size: 1.2rem;
+            }
+            &_md {
+                font-size: 0.9rem;
+            }
+            &_sm {
+                font-size: 0.8rem;
+            }
+            &_xs {
+                font-size: 0.7rem;
+            }
+        }
+
+        .hint {
             font-size: 0.8rem;
         }
-        &_xs {
-            font-size: 0.7rem;
-        }
-    }
 
-    .hint {
-        font-size: 0.8rem;
-    }
-
-    section {
-        &#section {
-            &-login, &-register, &-welcome {
-                padding-top: 8rem;
-            }
-            &-start, &-mood-genre {
-                padding-top: 8rem;
-            }
-            &-mood, &-genre {
-                padding-top: 6rem;
-            }
-        }
-    }
-
-    .card {
-        &-text {
-            font-size: 0.7rem;
-        }
-    }
-
-    .modal-container {
-        .overlay {
-            #ratingModal {
-                font-size: 1.5rem;
-                width: 90%;
-                height: 50%;
-                .rating_modal-rate {
-                    font-size: 1.5rem;
+        section {
+            &#section {
+                &-login, &-register, &-welcome {
+                    padding-top: 8rem;
+                }
+                &-start, &-mood-genre {
+                    padding-top: 8rem;
+                }
+                &-mood, &-genre {
+                    padding-top: 6rem;
                 }
             }
         }
-    }
 
-    .trailer {
-        &-input {
-            width: 80%;
-            padding: 0.5rem;
-            font-size: 0.8rem;
+        .card {
+            &-text {
+                font-size: 0.7rem;
+            }
         }
-    }
+
+        .modal-container {
+            .overlay {
+                #ratingModal {
+                    font-size: 1.5rem;
+                    width: 90%;
+                    height: 50%;
+                    .rating_modal-rate {
+                        font-size: 1.5rem;
+                    }
+                }
+            }
+        }
+
+        .trailer {
+            &-input {
+                width: 80%;
+                padding: 0.5rem;
+                font-size: 0.8rem;
+            }
+        }
 }
 
 /* for x-small screens only in portrait orientation */
-@media (orientation: portrait) and (max-width: 575px) {
-    .btn {
-        font-size: 0.8rem;
-        line-height: 0.7rem;
-    }
-
-    .btn-lg {
-        font-size: 0.8rem;
-        line-height: 0.7rem;
-    }
-
-    .spinner {
-        height: 35vh;
-    }
-
-    .brand {
-        font-size: 5rem;
-        line-height: 3rem;
-    }
-
-    .header {
-        &_big {
-            font-size: 1rem;
+@media screen
+    and (orientation: portrait) 
+    and (max-width: 575px) {
+        .btn {
+            font-size: 0.8rem;
+            line-height: 0.7rem;
         }
-    }
 
-    section {
-        &#section {
-            &-start, &-mood-genre {
-                padding-top: 6rem;
+        .btn-lg {
+            font-size: 0.8rem;
+            line-height: 0.7rem;
+        }
+
+        .spinner {
+            height: 35vh;
+        }
+
+        .brand {
+            font-size: 5rem;
+            line-height: 3rem;
+        }
+
+        .header {
+            &_big {
+                font-size: 1rem;
             }
         }
-    }
 
-    .card {
-        &-text {
-            font-size: 0.5rem;
+        section {
+            &#section {
+                &-start, &-mood-genre {
+                    padding-top: 6rem;
+                }
+            }
         }
-    }
+
+        .card {
+            &-text {
+                font-size: 0.5rem;
+            }
+        }
 }

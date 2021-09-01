@@ -14,7 +14,7 @@ body {
 }
 
 .content {
-    height: calc(100%-74px);
+    height: calc(100%-$navbar-height);
 }
 
 .hide {
@@ -223,7 +223,7 @@ div {
                 .star {
                     cursor: pointer;
                     &.checked {
-                        color: rgb(255, 208, 0);
+                        color: $color-yellow;
                     }
                     &.unchecked {
                         color: grey;
@@ -235,7 +235,7 @@ div {
 }
 
 .rating {
-    color: rgb(255, 208, 0);
+    color: $color-yellow;
 }
 
 .trailer {
