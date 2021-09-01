@@ -1,14 +1,14 @@
 /* for bigger screens only */
 @media screen 
     and (min-width: 768px) {
-    div {
-        &#section-user, &#section-trailers {
-            .card-text {
-                max-width: 210px !important;
-                height: 80px !important;
+        div {
+            &#section-user, &#section-trailers {
+                .card-text {
+                    max-width: 210px !important;
+                    height: 80px !important;
+                }
             }
         }
-    }
 }
 
 /* for landscape mode on mobile screens */
