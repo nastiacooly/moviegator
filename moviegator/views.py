@@ -5,19 +5,14 @@ import requests
 import random
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect, HttpResponseNotFound
-from django.shortcuts import render, redirect
+from django.http import HttpResponseRedirect, HttpResponseNotFound
+from django.shortcuts import render
 from django.urls import reverse
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt, ensure_csrf_cookie
-from django.views import generic
-from django.db.models import Count
-from django.core.paginator import EmptyPage, Paginator
+from django.views.decorators.csrf import ensure_csrf_cookie
+from django.core.paginator import Paginator
 from django.db import IntegrityError
-from django.db.models import Exists, OuterRef
-from requests import status_codes
 
 from .models import User, MovieDB, UserActions
 
@@ -150,6 +145,10 @@ def trailers_view(request):
 
 
 def get_data(request, parameter):
+    """
+    Makes API-request depending on parameter to get movie data
+    and returns JSON-response
+    """
     # Ensure request is made by Javascript (fetch)
     if request.is_ajax():
         # API calls depending on user's choice
@@ -193,6 +192,10 @@ def get_data(request, parameter):
 
 
 def get_data_by_genre(request, type, genre):
+    """
+    Makes API-request to get data of movie of certain genre
+    and returns JSON-response
+    """
     # Ensure request is made by Javascript (fetch)
     if request.is_ajax():
         # API calls depending on user's choice
@@ -233,6 +236,10 @@ def get_data_by_genre(request, type, genre):
 
 
 def add_to_watchlist(request):
+    """
+    Adds required movie to user's watchlist in DB
+    and returns JSON response
+    """
     # In case user is anonymous
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Sorry, you should log in first'})
@@ -282,6 +289,9 @@ def add_to_watchlist(request):
 
 @login_required
 def get_watchlist(request, page_number):
+    """
+    Returns JSON-response with watchlist items of the user by one page
+    """
     # Ensure request is AJAX
     if request.is_ajax():
         try:
@@ -301,7 +311,9 @@ def get_watchlist(request, page_number):
         for obj in objects_on_page:
             # Adding all movie details from MovieDB model to an item
             item = obj.movie
-            watchlist_to_render.append(item.serialize())
+            # Adding rating
+            rating = obj.rating
+            watchlist_to_render.append(item.serialize(rating))
 
         if len(watchlist_to_render) > 0:
             return JsonResponse(watchlist_to_render, safe=False)
@@ -315,6 +327,9 @@ def get_watchlist(request, page_number):
 
 @login_required
 def remove_from_watchlist(request):
+    """
+    Removes certain movie from user's watchlist in DB
+    """
     # Ensure POST-request is made by Javascript (fetch)
     if request.method == "POST" and request.is_ajax():
         # Getting JSON data
@@ -327,7 +342,7 @@ def remove_from_watchlist(request):
             return JsonResponse({'error': 'This title was not found'})
 
         # Removing from watchlist
-        movie_actions = movie.movie_actions
+        movie_actions = movie.movie_actions.get(user=request.user)
         try:
             movie_actions.watchlist = False
             movie_actions.save(update_fields=['watchlist'])
@@ -342,6 +357,9 @@ def remove_from_watchlist(request):
 
 @login_required
 def get_watched(request, page_number):
+    """
+    Returns JSON-response with watched list items of the user by one page
+    """
     # Ensure request is AJAX
     if request.is_ajax():
         try:
@@ -358,10 +376,12 @@ def get_watched(request, page_number):
             page = p.page(page_number)
 
         objects_on_page = page.object_list
-        # Adding all movie details from MovieDB model to an item
         for obj in objects_on_page:
+            # Adding all movie details from MovieDB model to an item
             item = obj.movie
-            watched_to_render.append(item.serialize())
+            # Adding rating
+            rating = obj.rating
+            watched_to_render.append(item.serialize(rating))
 
         if len(watched_to_render) > 0:
             return JsonResponse(watched_to_render, safe=False)
@@ -375,6 +395,9 @@ def get_watched(request, page_number):
 
 
 def mark_as_watched(request):
+    """
+    Marks certain movie as watched for certain user in DB
+    """
     # In case user is anonymous
     if not request.user.is_authenticated:
         return JsonResponse({'error': 'Sorry, you should log in first'})
@@ -424,6 +447,9 @@ def mark_as_watched(request):
 
 @login_required
 def mark_as_not_watched(request):
+    """
+    Marks certain movie as not watched for certain user in DB
+    """
     # Ensure POST-request is made by Javascript (fetch)
     if request.method == "POST" and request.is_ajax():
         # Getting JSON data
@@ -436,7 +462,7 @@ def mark_as_not_watched(request):
             return JsonResponse({'error': 'This title was not found'})
 
         # Mark as not watched
-        movie_actions = movie.movie_actions
+        movie_actions = movie.movie_actions.get(user=request.user)
         try:
             movie_actions.watched = False
             movie_actions.rating = '0'
@@ -452,6 +478,9 @@ def mark_as_not_watched(request):
 
 @login_required
 def save_rating(request):
+    """
+    Saves movie rating for certain user in DB
+    """
     # Ensure POST-request is made by Javascript (fetch)
     if request.method == "POST" and request.is_ajax():
         # Getting JSON data
@@ -465,7 +494,7 @@ def save_rating(request):
             return JsonResponse({'error': 'This title was not found'})
 
         # Save rating
-        movie_actions = movie.movie_actions
+        movie_actions = movie.movie_actions.get(user=request.user)
         try:
             movie_actions.rating = rating
             movie_actions.save(update_fields=['rating'])
@@ -479,6 +508,10 @@ def save_rating(request):
 
 
 def search_title(request, title):
+    """
+    Makes API request to get movies / shows with searched title
+    and returns JSON response
+    """
     # Ensure request is made by Javascript (fetch)
     if request.is_ajax():
         # API call for search results
@@ -503,6 +536,10 @@ def search_title(request, title):
 
 
 def get_trailer(request, movie_id):
+    """
+    Makes API request to get trailer URL by movie IMDB id
+    and returns JSON response
+    """
     # Ensure request is made by Javascript (fetch)
     if request.is_ajax():
         # API call for search results

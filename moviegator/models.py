@@ -21,7 +21,7 @@ class MovieDB(models.Model):
     image = models.URLField(max_length=1024, help_text='URL for poster from IMDb', blank=False)
     details = models.CharField(max_length=512, help_text="Additional details about director, cast, etc.")
 
-    def serialize(self):
+    def serialize(self, rating):
         return {
             "id": self.pk,
             "imdb_id": self.imdb_id,
@@ -30,13 +30,12 @@ class MovieDB(models.Model):
             "year": self.year,
             "image": self.image,
             "details": self.details,
-            "rating": self.movie_actions.rating
+            "rating": rating
         }
-
 
 class UserActions(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=False)
-    movie = models.OneToOneField(MovieDB, on_delete=models.CASCADE, blank=False, related_name="movie_actions")
+    movie = models.ForeignKey(MovieDB, on_delete=models.CASCADE, blank=False, related_name="movie_actions")
     watchlist = models.BooleanField(default=False)
     watched = models.BooleanField(default=False)
     RATINGS = (
