@@ -1,7 +1,7 @@
 # Moviegator
 ## A web-app which randomly recommends movies / TV shows based on your genre preference or mood.
 
-#### Video Demo: not currently available.
+#### Video Demo: [watch on YouTube](https://youtu.be/0yyQdpsxao0).
 
 
 #### 1. What is it?
