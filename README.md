@@ -106,9 +106,9 @@ The organization of folders and files is mostly the default organization provide
 
 1. Please, install all the packages mentioned in ["requirements.txt"](requirements.txt).
 
-[How to Install Django](https://docs.djangoproject.com/en/3.2/topics/install/).
+    - [How to Install Django](https://docs.djangoproject.com/en/3.2/topics/install/).
 
-Use `pip install python-dotenv` in your terminal to install 'dotenv'.
+    - Use `pip install python-dotenv` in your terminal to install 'dotenv'.
 
 2. Download this repository.
 
@@ -116,10 +116,10 @@ Use `pip install python-dotenv` in your terminal to install 'dotenv'.
 
 4. In root directory of the app (at the same level as "manage.py" file), create '.env' file. 
 
-In this file you should store API_KEY variable with your private API key received at step 3:
+    - In this file you should store API_KEY variable with your private API key received at step 3:
     `API_KEY=yourkey`
 
-Without this step, the app will not launch!
+    - Without this step, the app will not launch!
 
 5. When in root directory, execute the following terminal commands to make model migrations for the app:
 ```
