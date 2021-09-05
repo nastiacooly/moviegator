@@ -21,6 +21,9 @@ class MovieDB(models.Model):
     image = models.URLField(max_length=1024, help_text='URL for poster from IMDb', blank=False)
     details = models.CharField(max_length=512, help_text="Additional details about director, cast, etc.")
 
+    def __str__(self):
+        return f"{self.title} ({self.year}) / {self.type}"
+
     def serialize(self, rating):
         return {
             "id": self.pk,
