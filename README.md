@@ -109,21 +109,27 @@ The organization of folders and files is mostly the default organization provide
 [How to Install Django](https://docs.djangoproject.com/en/3.2/topics/install/).
 
 Use `pip install python-dotenv` in your terminal to install 'dotenv'.
+
 2. Download this repository.
+
 3. Register on [imdb-api](https://imdb-api.com/Identity/Account/Register) to receive your **free** private API key.
+
 4. In root directory of the app (at the same level as "manage.py" file), create '.env' file. 
 
 In this file you should store API_KEY variable with your private API key received at step 3:
     `API_KEY=yourkey`
 
 Without this step, the app will not launch!
+
 5. When in root directory, execute the following terminal commands to make model migrations for the app:
 ```
 py - 3 manage.py makemigrations
 py -3 manage.py migrate
 ```
+
 6. To run the app locally, execute the following command:
 `py -3 manage.py runserver`
+
 7. Enjoy Moviegator! 
 
 *If you have any questions on the functionality of the app, please watch the [demo video](https://github.com/nastiacooly/moviegator#video-demo-not-currently-available).*
