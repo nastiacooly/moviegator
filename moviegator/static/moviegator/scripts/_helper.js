@@ -30,7 +30,7 @@ End of configuration
 Helper functions
 */
 
-// Functions for hiding/showing elements
+/* Functions for hiding/showing elements */
 export function hide(element) {
     element.classList.add("hide");
     element.classList.remove("show");
@@ -60,7 +60,7 @@ export function removeWithAnimation(element, animationName) {
     });
 }
 
-// Renders alert messages
+/* Renders alert messages */
 export function renderMessageAlert(message, type) {
     const messageView = document.querySelector(`#${configuration.CSS.IDs.messageView}`);
     messageView.className = `alert alert-${type}`;
@@ -69,14 +69,14 @@ export function renderMessageAlert(message, type) {
     messageView.style.display = 'block';
 }
 
-// Removes alerts
+/* Removes alerts */
 export function removeMessageAlert() {
     const messageView = document.querySelector(`#${configuration.CSS.IDs.messageView}`);
     messageView.style.display = 'none';
 }
 
 
-// Render info paragraph (if none) inside parent 
+/* Render info paragraph (if none) inside parent */
 export function renderInfo(text, parent) {
     if (!parent.querySelector(`p.${configuration.CSS.classes.info}`)) {
         const info = document.createElement('p');
@@ -87,7 +87,7 @@ export function renderInfo(text, parent) {
 }
 
 
-// Rendering spinner animated img on loadng data inside a specified parent element
+/* Rendering spinner animated img on loadng data inside a specified parent element */
 export function renderSpinner(parent) {
     const spinner = document.createElement('img');
     spinner.src = configuration.staticFilesSrc.spinnerSVG;
@@ -97,7 +97,7 @@ export function renderSpinner(parent) {
 }
 
 
-// Function to remove all children elements of a parent element
+/* Function to remove all children elements of a parent element */
 export function removeChildrenElements(parent) {
     let firstChild = parent.firstElementChild;
     while(firstChild) {
@@ -107,7 +107,7 @@ export function removeChildrenElements(parent) {
 }
 
 
-// Function to make GET-requests which returns JSON-data
+/* Function to make GET-requests which returns JSON-data */
 export const getResource = async (url) => {
     const result = await fetch(url, {
         headers: {
@@ -124,7 +124,7 @@ export const getResource = async (url) => {
 };
 
 
-// Function to make POST-requests which returns JSON-data
+/* Function to make POST-requests which returns JSON-data */
 export const postData = async (url, data, csrftoken) => {
     const result = await fetch(url, {
         method: 'POST',

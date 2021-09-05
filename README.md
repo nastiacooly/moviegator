@@ -10,7 +10,7 @@ Moviegator is my final project for CS50w: Web-Programming with Python and Javasc
 
 Moviegator is a web-application built on Django Framework and vanilla Javascript with help of imdb-api.com (third-party API).
 
-Developed in 2021 by Anastasia Maryina (@nastiacooly).
+Developed in 2021 by Anastasia Maryina ([@nastiacooly](https://github.com/nastiacooly)).
 
 
 #### 2. What can it do?
@@ -25,7 +25,7 @@ Moviegator provides the following features:
 
 2. To registered users:
     - Logging in and out of your account;
-    - All of the above-mentioned feautures provided for non-registered users;
+    - All of the above-mentioned features provided for non-registered users;
     - Opening your profile page with watchlist and 'watched' list;
     - Adding movie / TV show to your watchlist / Removing title from watchlist;
     - Marking movie / TV show as already watched / Marking title as not watched;
@@ -38,7 +38,7 @@ Moviegator provides the following features:
 
   - Frontend: HTML5, CSS3/Scss (+ Bootstrap), vanilla Javascript;
   - Backend: Django Framework (Python);
-  - API: imdp-api.com (third-party API).
+  - API: [imdb-api.com](https://imdb-api.com) (third-party API).
 
 
 #### 4. Distinctiveness and Complexity
@@ -50,19 +50,21 @@ Moviegator provides the following features:
     - it is not an auction / e-commerce site;
     - it is not a mail page;
     - it is not a social network.
+
 Moviegator is an app which recommends movies / TV shows and provides features 
 for adding such titles to watchlist or mark them as watched, rate titles and watch their trailers.
 
-2. Moviegator is more complex than the other projects in CS50W course as:
+2. Moviegator is more complex than the other projects in CS50w course as:
 
     - Moviegator works with the third-party API to get data about movies / TV shows. 
-        To secure API calls and API private key, I applied the following scheme:
+        To secure API calls and private API key, I applied the following scheme:
         - JS-script (frontend) fetches certain URL of the app;
-        - Then, backend makes sure that request was made by AJAX 
-        and makes necessary API-call by retrieving private API key from environment variable;
+        - Then, backend makes sure that the request was made by AJAX 
+        and makes necessary API-call by retrieving private API key from the environment variable;
         - When backend receives response from API, it returns JSON data;
         - JS-script receives JSON-response from backend, processes it and renders necessary content for user.
-    These scheme is useful as API URLs and API private key are not shown in browsers' dev tools console or URL bar.
+    
+    These scheme is useful as API URLs and private key are not shown in browsers' dev tools console or URL bar.
 
     - Moviegator is designed mostly as a dynamic SPA meaning that all the contents of the pages are asynchronously loaded/changed by frontend script. All of the HTML-templates of the app does not initially contain any movies / TV shows data or data from user's lists. And the sections of the main page are dynamically switching depending on user's actions. 
     All of this was achieved with help of AJAX.
@@ -72,9 +74,9 @@ for adding such titles to watchlist or mark them as watched, rate titles and wat
 
     - All of the POST-requests made by JS-script (frontend) are secured with CSRF-token.
 
-    - Moviegator's backend is always checking that important requests are AJAX only.
+    - Moviegator's backend is always checking that important requests to the app are AJAX only.
 
-    - The app throws RuntimeError (so it is not running) when API private key is not set in environmental variable.
+    - The app throws RuntimeError (so it is not running) when private API key is not set as environment variable.
 
 3. Moviegator is mobile-responsive both for portrait and landscape orientations.
 
@@ -102,14 +104,18 @@ The organization of folders and files is mostly the default organization provide
 
 #### 6. How to run Moviegator?
 
-1. Please, install all the packages mentioned in "Requirements.txt".
+1. Please, install all the packages mentioned in ["requirements.txt"](requirements.txt).
+
 [How to Install Django](https://docs.djangoproject.com/en/3.2/topics/install/).
+
 Use `pip install python-dotenv` in your terminal to install 'dotenv'.
 2. Download this repository.
 3. Register on [imdb-api](https://imdb-api.com/Identity/Account/Register) to receive your **free** private API key.
 4. In root directory of the app (at the same level as "manage.py" file), create '.env' file. 
+
 In this file you should store API_KEY variable with your private API key received at step 3:
     `API_KEY=yourkey`
+
 Without this step, the app will not launch!
 5. When in root directory, execute the following terminal commands to make model migrations for the app:
 ```
@@ -118,6 +124,8 @@ py -3 manage.py migrate
 ```
 6. To run the app locally, execute the following command:
 `py -3 manage.py runserver`
-7. Enjoy Moviegator! (If you have any questions on the functionality of the app, please watch the demo video on YouTube).
+7. Enjoy Moviegator! 
+
+*If you have any questions on the functionality of the app, please watch the [demo video](https://github.com/nastiacooly/moviegator#video-demo-not-currently-available).*
 
 

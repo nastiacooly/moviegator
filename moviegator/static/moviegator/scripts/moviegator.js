@@ -788,9 +788,9 @@ function getCookie(name) {
 
 
 /* Function for handling and rendering recommended movie data
-Parameters: data - for JS-object with data, 
-detailsParameter - for data.key which contains details about movie's stars/crew, 
-resultContainer - parent-element for rendering result in.
+ * Parameters: data - for JS-object with data, 
+ * detailsParameter - for data.key which contains details about movie's stars/crew, 
+ * resultContainer - parent-element for rendering result in.
 */
 const renderResult = (data, detailsParameter, resultContainer) => {
     if (data.error) {
@@ -958,7 +958,7 @@ function saveRating(rating, movieID) {
 
     const data = JSON.stringify(movie_details);
     
-    // Make POST-request to add movie/show to movie database of the app and to watchlist
+    // Make POST-request to save rating in database
     helper.postData(url, data, config.backend.csrftoken)
     .then(data => {
         if (data.error) {
