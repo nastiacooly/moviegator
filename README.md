@@ -66,7 +66,7 @@ for adding such titles to watchlist or mark them as watched, rate titles and wat
     
     These scheme is useful as API URLs and private key are not shown in browsers' dev tools console or URL bar.
 
-    - Moviegator is designed mostly as a dynamic SPA meaning that all the contents of the pages are asynchronously loaded/changed by frontend script. All of the HTML-templates of the app does not initially contain any movies / TV shows data or data from user's lists. And the sections of the main page are dynamically switching depending on user's actions. 
+    - Moviegator is designed mostly as a dynamic SPA meaning that all the contents of the pages are asynchronously loaded/changed by frontend script. All of the HTML-templates of the app do not initially contain any movies / TV shows data or data from user's lists. And the sections of the main page are dynamically switching depending on user's actions. 
     All of this was achieved with help of AJAX.
 
     - Moviegator applies infinite scroll for watchlist and 'watched' list, so the user should not click 'next' or 'previous' page buttons to see all the contents - user can just scroll to the end of the page and the content will be loaded and rendered.
