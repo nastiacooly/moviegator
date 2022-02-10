@@ -1,2 +1,2 @@
-﻿Django==3.2.5
+﻿Django==3.2.12
 python-dotenv==0.17.0
